@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NCAGE Frontend (Next.js)
 
-## Getting Started
+Frontend untuk proyek pendaftaran **NCAGE**. Project ini memakai **Next.js App Router**, **TypeScript**, dan **Tailwind CSS**.
 
-First, run the development server:
+## Prasyarat
+
+- **Node.js**: minimal **v18** (disarankan **v20 LTS** atau terbaru yang stabil)
+- **npm**: mengikuti Node (project ini pakai `package-lock.json`)
+- **Git**: untuk clone repository
+
+Cek versi:
+
+```bash
+node -v
+npm -v
+git --version
+```
+
+## Cara menjalankan (lokal)
+
+### 1) Clone & masuk folder
+
+```bash
+git clone <url-repo-kalian>
+cd ncage-fe
+```
+
+### 2) Install dependency
+
+Pakai:
+
+```bash
+npm install
+```
+
+### 4) Jalankan dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Struktur project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Project ini menggunakan struktur “`src/`-based” (kode utama ada di `src/`).
 
-## Learn More
+### `src/app` (Next.js App Router)
 
-To learn more about Next.js, take a look at the following resources:
+Folder `src/app` adalah pusat routing dan layout (App Router).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **`src/app/layout.tsx`**: _Root layout_ untuk seluruh halaman (biasanya tempat:
+  - import global CSS (`globals.css`)
+  - set `metadata`
+  - wrapper `<html>` / `<body>` / provider global)
+- **`src/app/page.tsx`**: halaman untuk route `/`
+- **`src/app/globals.css`**: styling global (Tailwind v4 di-import lewat `@import "tailwindcss";`)
+- **`src/app/favicon.ico`**: favicon
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Folder lain di `src/`
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **`src/components/`**: komponen UI reusable (disarankan per-feature atau per-domain jika sudah besar)
+- **`src/hooks/`**: custom hooks React
+- **`src/lib/`**: util/helper umum (formatting, constants, client setup, dsb.)
+- **`src/services/`**: layer komunikasi ke API (fetcher, client, wrapper endpoint)
+- **`src/stores/`**: state management (kalau nanti pakai Zustand/Redux/dll)
+- **`src/types/`**: tipe TypeScript (DTO, interface domain, dsb.)
