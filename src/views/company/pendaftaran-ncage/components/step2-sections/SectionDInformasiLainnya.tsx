@@ -1,6 +1,10 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
+import type { NcageRegistrationFormValues } from "@/src/schema";
 
 export default function SectionDInformasiLainnya() {
+  const { register } = useFormContext<NcageRegistrationFormValues>();
+
   const inputClass =
     "w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm focus:border-[#8a1515] focus:ring-1 focus:ring-[#8a1515] outline-none transition-all placeholder-gray-400";
   const labelClass = "block text-sm font-semibold text-gray-700 mb-2";
@@ -18,6 +22,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan produk yang dihasilkan"
             className={inputClass}
+            {...register("produk_dihasilkan")}
           />
         </div>
         <div>
@@ -26,6 +31,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan kemampuan produksi"
             className={inputClass}
+            {...register("kemampuan_produksi")}
           />
         </div>
         <div>
@@ -34,6 +40,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan jumlah karyawan"
             className={inputClass}
+            {...register("jumlah_karyawan")}
           />
         </div>
       </div>
@@ -48,6 +55,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan kantor cabang"
             className={inputClass}
+            {...register("kantor_cabang")}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -57,6 +65,7 @@ export default function SectionDInformasiLainnya() {
               type="text"
               placeholder="Masukkan nama jalan"
               className={inputClass}
+              {...register("jalan_cabang")}
             />
           </div>
           <div>
@@ -65,6 +74,7 @@ export default function SectionDInformasiLainnya() {
               type="text"
               placeholder="Masukkan kota"
               className={inputClass}
+              {...register("kota_cabang")}
             />
           </div>
         </div>
@@ -74,6 +84,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan kode pos"
             className={inputClass}
+            {...register("kode_pos_cabang")}
           />
         </div>
       </div>
@@ -88,6 +99,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan perusahaan afiliasi"
             className={inputClass}
+            {...register("perusahaan_afiliasi_info")}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -97,6 +109,7 @@ export default function SectionDInformasiLainnya() {
               type="text"
               placeholder="Masukkan nama jalan"
               className={inputClass}
+              {...register("jalan_afiliasi")}
             />
           </div>
           <div>
@@ -105,6 +118,7 @@ export default function SectionDInformasiLainnya() {
               type="text"
               placeholder="Masukkan kota"
               className={inputClass}
+              {...register("kota_afiliasi")}
             />
           </div>
         </div>
@@ -114,6 +128,7 @@ export default function SectionDInformasiLainnya() {
             type="text"
             placeholder="Masukkan kode pos"
             className={inputClass}
+            {...register("kode_pos_afiliasi")}
           />
         </div>
       </div>

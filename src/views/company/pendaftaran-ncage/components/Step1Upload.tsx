@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import FileUploadDropzone from "@/src/components/ui/FileUploadDropzone";
+import { useFormContext, Controller } from "react-hook-form";
+import type { NcageRegistrationFormValues } from "@/src/schema";
 
 const documentRequirements = [
   {
@@ -21,7 +23,7 @@ const documentRequirements = [
     label: "Foto Kantor (Dengan GPS Map Camera)",
     required: true,
     accept: "image/*",
-  }, // Khusus ini foto
+  },
   { name: "ktp_direksi", label: "KTP Direksi", required: true, accept: ".pdf" },
   {
     name: "akta_notaris",
@@ -68,18 +70,10 @@ const documentRequirements = [
 ];
 
 export default function Step1Upload() {
-  // STATE SEMENTARA: Menyimpan file yang diupload dalam bentuk object { fieldName: File }
-  // Nanti ini akan digantikan oleh react-hook-form
-  const [uploadedFiles, setUploadedFiles] = useState<
-    Record<string, File | null>
-  >({});
-
-  const handleFileChange = (name: string, file: File | null) => {
-    setUploadedFiles((prev) => ({
-      ...prev,
-      [name]: file,
-    }));
-  };
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<NcageRegistrationFormValues>();
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -90,22 +84,41 @@ export default function Step1Upload() {
       </div>
 
       <div className="border border-t-0 border-gray-200 rounded-b-xl p-6 md:p-8 space-y-2">
-        {documentRequirements.map((doc) => (
-          <div key={doc.name}>
-            <FileUploadDropzone
-              label={doc.label}
-              name={doc.name}
-              required={doc.required}
-              accept={doc.accept}
-              value={uploadedFiles[doc.name] || null}
-              onChange={(file) => handleFileChange(doc.name, file)}
-            />
-            {doc.name !==
-              documentRequirements[documentRequirements.length - 1].name && (
-              <hr className="my-8 border-gray-200 border-dashed" />
-            )}
-          </div>
-        ))}
+        {documentRequirements.map((doc) => {
+          const fieldError =
+            errors[doc.name as keyof NcageRegistrationFormValues];
+
+          return (
+            <div key={doc.name}>
+              <Controller
+                name={doc.name as keyof NcageRegistrationFormValues}
+                control={control}
+                render={({ field }) => (
+                  <FileUploadDropzone
+                    label={doc.label}
+                    name={doc.name}
+                    required={doc.required}
+                    accept={doc.accept}
+                    value={field.value as File | null}
+                    onChange={field.onChange}
+                    error={fieldError?.message?.toString()}
+                  />
+                )}
+              />
+
+              {fieldError && (
+                <p className="text-red-500 text-sm font-semibold mt-2 px-1">
+                  {fieldError.message?.toString()}
+                </p>
+              )}
+
+              {doc.name !==
+                documentRequirements[documentRequirements.length - 1].name && (
+                <hr className="my-8 border-gray-200 border-dashed" />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
