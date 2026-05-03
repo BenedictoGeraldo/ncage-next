@@ -46,3 +46,30 @@ export async function register(formData: FormData) {
 
   redirect("/login?registered=true");
 }
+
+export async function login(
+  prevState: { error: string } | null,
+  formData: FormData,
+): Promise<{ error: string } | null> {
+  const supabase = await createClient();
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  if (!email || !password) {
+    return { error: "Email dan kata sandi wajib diisi" };
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error("Error login:", error.message);
+    return { error: "Email atau kata sandi salah" };
+  }
+
+  redirect("/beranda");
+  return null;
+}
