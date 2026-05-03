@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { register } from "../action";
 
-export default function RegisterPage() {
+const RegisterPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5EEE8] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#B97A57]/20 rounded-full translate-x-1/3 -translate-y-1/3" />
@@ -45,6 +45,7 @@ export default function RegisterPage() {
                 name="fullName"
                 type="text"
                 placeholder="Masukkan Nama Narahubung"
+                required
                 className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#8B1E1E] outline-none"
               />
             </div>
@@ -61,6 +62,7 @@ export default function RegisterPage() {
                 name="email"
                 type="email"
                 placeholder="Masukkan alamat email"
+                required
                 className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#8B1E1E] outline-none"
               />
             </div>
@@ -77,6 +79,7 @@ export default function RegisterPage() {
                 name="company"
                 type="text"
                 placeholder="Masukkan Nama Perusahaan"
+                required
                 className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#8B1E1E] outline-none"
               />
             </div>
@@ -94,6 +97,7 @@ export default function RegisterPage() {
                   name="password"
                   type="password"
                   placeholder="Masukkan Kata Sandi"
+                  required
                   className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg pr-10 focus:ring-2 focus:ring-[#8B1E1E] outline-none"
                 />
                 <i className="ri-eye-off-line absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"></i>
@@ -112,6 +116,7 @@ export default function RegisterPage() {
                 name="phone"
                 type="text"
                 placeholder="Masukkan Nomor Telepon"
+                required
                 className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#8B1E1E] outline-none"
               />
             </div>
@@ -129,6 +134,7 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   type="password"
                   placeholder="Masukkan Ulang Kata Sandi"
+                  required
                   className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg pr-10 focus:ring-2 focus:ring-[#8B1E1E] outline-none"
                 />
                 <i className="ri-eye-off-line absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"></i>
@@ -167,4 +173,6 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-}
+};
+
+export default RegisterPage;
