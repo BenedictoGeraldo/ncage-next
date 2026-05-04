@@ -40,7 +40,7 @@ const Navbar = () => {
             height={40}
             className="object-contain"
           />
-          <div>
+          <div className="flex flex-col gap-0.5">
             <p className="font-semibold text-sm leading-tight">
               Pelayanan NCAGE
             </p>
@@ -55,10 +55,10 @@ const Navbar = () => {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`text-sm font-medium transition-all px-4 py-2.5 rounded-xl ${
+                  className={`text-sm transition-all px-4 py-2.5 rounded-xl ${
                     isActive
-                      ? "bg-[#FDECEC] text-[#8B1E1E]"
-                      : "text-[#374151] hover:text-[#8B1E1E]"
+                      ? "bg-[#FDECEC] text-[#8B1E1E] font-semibold"
+                      : "text-[#374151] hover:text-[#8B1E1E] font-medium"
                   }`}
                 >
                   {link.label}

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function BerandaPage() {
@@ -59,7 +60,7 @@ export default function BerandaPage() {
       <section
         className="relative w-full overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #F8F5F2, #F3EAEA, #FDECEC)",
+          background: "linear-gradient(135deg, #FAF8F5 0%, #EEE4E2 50%, #D697A0 100%)",
         }}
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch min-h-[500px]">
@@ -78,16 +79,14 @@ export default function BerandaPage() {
             </p>
 
             <div>
-              <button className="mt-10 bg-[#5D3A3A] text-white px-12 py-3.5 rounded-xl shadow hover:bg-[#4A2D2D] transition text-lg font-medium">
+              <Link href="/register" className="inline-block mt-10 bg-[#5D3A3A] text-white px-12 py-3.5 rounded-xl shadow hover:bg-[#4A2D2D] transition text-lg font-semibold">
                 Mulai Pendaftaran
-              </button>
+              </Link>
             </div>
           </div>
 
           {/* RIGHT IMAGE */}
           <div className="w-full md:w-1/2 flex items-end justify-end relative mt-8 md:mt-0">
-            {/* subtle glow pink */}
-            <div className="absolute w-64 h-64 bg-pink-200 rounded-full blur-3xl opacity-30 right-0 bottom-0 z-0"></div>
 
             <div className="relative z-10 flex">
               <Image
@@ -98,13 +97,6 @@ export default function BerandaPage() {
                 className="w-auto h-[350px] md:h-[550px] object-cover object-bottom"
                 priority
               />
-              {/* OVERLAY */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: "linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(139, 30, 30, 0.4) 100%)"
-                }}
-              ></div>
             </div>
           </div>
         </div>
@@ -116,7 +108,7 @@ export default function BerandaPage() {
           
           {/* TITLE BANNER */}
           <div className="bg-gradient-to-r from-[#FDFBFB] via-[#F8EDEE] to-[#FDFBFB] py-5 px-8 mb-16 flex justify-center items-center">
-            <h3 className="text-2xl font-medium text-black tracking-wide">
+            <h3 className="text-2xl font-semibold text-black tracking-wide">
               Tahapan Alur Penggunaan Kode NCAGE
             </h3>
           </div>
@@ -181,7 +173,7 @@ export default function BerandaPage() {
       <section className="pb-20 bg-white">
         <div className="max-w-7xl mx-auto px-8">
           <div className="bg-[#F6F6F6] rounded-2xl p-10 md:p-14">
-            <h3 className="text-3xl md:text-33xl font-medium text-center text-black mb-10">
+            <h3 className="text-3xl md:text-3xl font-semibold text-center text-black mb-10">
               Pertanyaan Umum Seputar NCAGE
             </h3>
             
