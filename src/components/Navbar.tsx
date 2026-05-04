@@ -13,6 +13,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Connect to actual auth state
   const pathname = usePathname();
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const Navbar = () => {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`text-sm font-medium transition-all px-3 py-2.5 rounded-lg ${
+                  className={`text-sm font-medium transition-all px-4 py-2.5 rounded-xl ${
                     isActive
                       ? "bg-[#FDECEC] text-[#8B1E1E]"
                       : "text-[#374151] hover:text-[#8B1E1E]"
@@ -67,20 +68,37 @@ const Navbar = () => {
           })}
         </ul>
 
-        <div className="flex items-center gap-3">
-          <button className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-100 transition">
-            <i className="ri-notification-3-line text-lg text-[#374151]"></i>
-          </button>
-          <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#8B1E1E] cursor-pointer">
-            <Image
-              src="/avatar.png"
-              alt="avatar"
-              width={36}
-              height={36}
-              className="object-cover w-full h-full"
-            />
+        {!isLoggedIn ? (
+          <div className="flex items-center gap-5">
+            <Link 
+              href="/login" 
+              className="px-6 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-black hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-sm"
+            >
+              Log in
+            </Link>
+            <Link 
+              href="/register" 
+              className="px-6 py-2.5 rounded-full bg-[#5D3A3A] text-sm font-medium text-white hover:bg-[#4A2D2D] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md shadow-sm"
+            >
+              Daftar
+            </Link>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-100 transition">
+              <i className="ri-notification-3-line text-lg text-[#374151]"></i>
+            </button>
+            <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#8B1E1E] cursor-pointer">
+              <Image
+                src="/avatar.png"
+                alt="avatar"
+                width={36}
+                height={36}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          </div>
+        )}
       </nav>
     </div>
   );
