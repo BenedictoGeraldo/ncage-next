@@ -10,8 +10,14 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "NCAGE",
-  description: "Pelayanan NCAGE",
+  title: "NCAGE Indonesia | Pelayanan NCAGE Pusat Kodifikasi",
+  description: "Platform digital resmi untuk pendaftaran dan pemantauan status kode NCAGE Indonesia secara terintegrasi.",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -20,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    <html lang="en" className={`${poppins.variable} antialiased`}>
+      <body className="font-sans overflow-x-hidden">{children}</body>
     </html>
   );
 }

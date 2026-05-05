@@ -21,55 +21,66 @@ export default function SubmissionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/40 transition-opacity animate-in fade-in duration-300"
         onClick={!isLoading ? onClose : undefined}
-      ></div>
+      />
 
-      <div className="relative bg-white rounded-3xl w-full max-w-lg p-8 md:p-10 shadow-2xl animate-in zoom-in-95 duration-300">
-        <div className="flex flex-col items-center text-center">
-          <div className="w-24 h-24 bg-[#fcf0f0] rounded-full flex items-center justify-center mb-6">
-            <i
-              className={`text-5xl text-[#8a1515] ${
-                isConfirm ? "ri-send-plane-fill" : "ri-send-plane-fill"
-              }`}
-            ></i>
+      {/* Modal Container */}
+      <div
+        className="relative bg-white border border-gray-100 rounded-[15px] w-full max-w-lg overflow-hidden shadow-xl px-10 py-14 text-center animate-in zoom-in-95 duration-300 z-20"
+      >
+        <div className="text-center">
+          {/* Icon Container */}
+          <div className="mx-auto w-20 h-20 mb-6">
+            <div className={`w-full h-full rounded-full flex items-center justify-center ${isConfirm ? 'bg-red-50 text-[#8a1515]' : 'bg-emerald-50 text-emerald-600'}`}>
+              <i className={`${isConfirm ? 'ri-send-plane-fill' : 'ri-checkbox-circle-fill'} text-4xl`}></i>
+            </div>
           </div>
 
-          <h2 className="text-xl md:text-2xl font-bold text-[#8a1515] mb-4">
-            {isConfirm
-              ? "Konfirmasi Pengiriman Dokumen"
-              : "Sukses! Pengajuan berhasil dikirim ke sistem"}
+          <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3">
+            {isConfirm ? "Kirim Pendaftaran?" : "Berhasil Dikirim!"}
           </h2>
-
-          <p className="text-gray-700 text-base md:text-lg mb-8">
-            {isConfirm
-              ? "Apakah Anda yakin ingin mengirim form pendaftaran ini?"
-              : "Status pengajuan anda dapat dipantau melalui menu Pantau Status."}
+          <p className="text-gray-500 text-sm leading-relaxed mb-8">
+            {isConfirm 
+              ? "Pastikan data sudah benar. Data yang telah dikirim tidak dapat diubah selama proses verifikasi."
+              : "Pengajuan berhasil masuk. Pantau statusnya secara berkala melalui dashboard."
+            }
           </p>
 
-          <div className="flex flex-col sm:flex-row w-full gap-4 justify-between mt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl border border-[#8a1515] text-[#8a1515] font-semibold hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <i className="ri-arrow-left-s-line text-lg"></i>
-              {isConfirm ? "Kembali" : "Selesai"}
-            </button>
-
-            {isConfirm && (
+          <div className="flex flex-col gap-3">
+            {isConfirm ? (
+              <>
+                <button
+                  type="button"
+                  onClick={onConfirm}
+                  disabled={isLoading}
+                  className="w-full py-4 px-4 bg-[#8a1515] hover:bg-[#6e1010] text-white font-medium rounded-[15px] transition-colors shadow-lg shadow-red-900/10 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Memproses...
+                    </>
+                  ) : "Kirim Sekarang"}
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isLoading}
+                  className="w-full py-4 px-4 text-gray-500 font-medium rounded-[15px] hover:bg-gray-50 transition-colors active:scale-95"
+                >
+                  Cek Kembali
+                </button>
+              </>
+            ) : (
               <button
                 type="button"
-                onClick={onConfirm}
-                disabled={isLoading}
-                className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#8a1515] text-white font-semibold hover:bg-[#6e1010] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                onClick={onClose}
+                className="w-full py-4 px-4 bg-[#8a1515] hover:bg-[#6e1010] text-white font-medium rounded-[15px] transition-colors shadow-lg shadow-red-900/10 active:scale-95"
               >
-                {isLoading ? "Memproses..." : "Kirim Pengajuan"}
-                {!isLoading && (
-                  <i className="ri-arrow-right-s-line text-lg"></i>
-                )}
+                Ke Halaman Pantau Status
               </button>
             )}
           </div>
@@ -78,3 +89,5 @@ export default function SubmissionModal({
     </div>
   );
 }
+
+

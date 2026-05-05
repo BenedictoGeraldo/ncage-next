@@ -1,5 +1,6 @@
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import PageTransition from "../../components/PageTransition";
 
 export default function CompanyLayout({
   children,
@@ -9,7 +10,9 @@ export default function CompanyLayout({
   return (
     <>
       <Navbar />
-      <main className="pt-25">{children}</main>
+      <main className="pt-[65px]">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
     </>
   );

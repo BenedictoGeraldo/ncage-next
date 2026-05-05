@@ -2,14 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useState, useActionState } from "react";
 import { login } from "../action";
 
 const LoginPage = () => {
   const [state, formAction] = useActionState(login, null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5EEE8] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-24 bg-[#F5EEE8] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#B97A57]/20 rounded-full translate-x-1/3 -translate-y-1/3" />
 
       <div className="absolute top-6 left-10 flex items-center gap-3">
@@ -28,44 +30,80 @@ const LoginPage = () => {
         </div>
       </div>
 
-      <div className="bg-[#FFFFFF] w-full max-w-md p-8 rounded-2xl shadow-lg z-10">
-        <h2 className="text-center text-[#8B1E1E] font-semibold text-xl mb-6">
+      <div className={`bg-[#FFFFFF] w-full max-w-[520px] px-8 sm:px-12 py-10 rounded-[15px] shadow-xl z-10 border border-gray-100 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out ${state?.error ? 'animate-shake' : ''}`}>
+        <h2 className="text-center text-[#8B1E1E] font-semibold text-2xl mb-10 tracking-tight">
           Selamat Datang di Layanan NCAGE
         </h2>
 
-        {state?.error && (
-          <div className="mb-4 px-4 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-            {state.error}
-          </div>
-        )}
-
         <form action={formAction} className="flex flex-col">
-          <div className="mb-4">
-            <label className="block text-sm text-[#374151] mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Masukkan alamat email"
-              className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]"
-            />
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-[#374151] mb-2">
+              Email
+            </label>
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400/40 group-focus-within:text-[#8B1E1E] transition-colors">
+                <i className="ri-mail-line text-xl"></i>
+              </div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Masukkan alamat email"
+                required
+                className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl text-[#374151] font-medium placeholder:font-normal placeholder:text-gray-400/50 focus:outline-none focus:ring-4 transition-all ${
+                  state?.error 
+                    ? 'border-red-400 focus:ring-red-400/10 focus:border-red-400 bg-red-50/10' 
+                    : 'border-[#E5E7EB] focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]'
+                }`}
+              />
+            </div>
           </div>
 
-          <div className="mb-2">
-            <label className="block text-sm text-[#374151] mb-1">
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-[#374151] mb-2">
               Kata Sandi
             </label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Masukkan Kata Sandi"
-              className="w-full px-4 text-gray-500 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]"
-            />
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors flex items-center gap-1">
+                {password.length > 5 && !state?.error ? (
+                  <i className="ri-checkbox-circle-fill text-xl text-green-500 animate-in zoom-in"></i>
+                ) : (
+                  <i className={`${showPassword ? 'ri-lock-unlock-line' : 'ri-lock-line'} text-xl ${password.length > 0 ? (state?.error ? 'text-red-400' : 'text-[#8B1E1E]') : 'text-gray-400/40'}`}></i>
+                )}
+              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+                placeholder="Masukkan Kata Sandi"
+                required
+                className={`w-full pl-12 pr-12 py-3 bg-white border rounded-xl text-[#374151] font-medium placeholder:font-normal placeholder:text-gray-400/50 focus:outline-none focus:ring-4 transition-all ${
+                  state?.error 
+                    ? 'border-red-400 focus:ring-red-400/10 focus:border-red-400 bg-red-50/10' 
+                    : 'border-[#E5E7EB] focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B1E1E] transition-colors"
+              >
+                <i className={showPassword ? "ri-eye-line" : "ri-eye-off-line"}></i>
+              </button>
+            </div>
+            {state?.error && (
+              <p className="mt-2 text-xs text-red-500 font-medium animate-in slide-in-from-top-1">
+                {state.error}
+              </p>
+            )}
           </div>
 
-          <div className="text-right mb-4">
+          <div className="text-right mb-8">
             <Link
               href="/forgot-password"
-              className="text-sm text-[#8B1E1E] hover:underline"
+              className="text-sm text-[#8B1E1E] font-medium hover:opacity-80 transition-opacity"
             >
               Lupa Kata Sandi?
             </Link>
@@ -73,15 +111,15 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#5D3A3A] text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+            className="w-full bg-[#5D3A3A] text-white py-4 rounded-xl font-bold text-base hover:bg-[#4a2e2e] transition-all active:scale-[0.98] shadow-lg shadow-[#5D3A3A]/10"
           >
             Masuk
           </button>
         </form>
 
-        <p className="text-center text-sm mt-4 text-[#000000]">
+        <p className="text-center text-base mt-8 text-gray-500 font-medium">
           Belum memiliki akun?{" "}
-          <Link href="/register" className="text-[#8B1E1E] font-medium">
+          <Link href="/register" className="text-[#8B1E1E] font-bold hover:opacity-80 transition-opacity">
             Daftar
           </Link>
         </p>

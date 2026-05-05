@@ -38,14 +38,14 @@ export const unggahBerkasSchema = z.object({
   surat_permohonan: fileSchema(true),
   surat_pernyataan: fileSchema(true),
   foto_kantor: fileSchema(true, true),
-  ktp_direksi: fileSchema(true),
+  sk_domisili: fileSchema(false),
   akta_notaris: fileSchema(true),
   sk_kemenkumham: fileSchema(true),
   siup_nib: fileSchema(true),
   company_profile: fileSchema(true),
   npwp_perusahaan: fileSchema(true),
   surat_kuasa: fileSchema(false),
-  letter_sam_gov: fileSchema(false),
+  daftar_isian_sam: fileSchema(false),
 });
 
 export type UnggahBerkasFormValues = z.infer<typeof unggahBerkasSchema>;

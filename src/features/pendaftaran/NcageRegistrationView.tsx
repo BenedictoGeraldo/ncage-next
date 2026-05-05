@@ -18,6 +18,7 @@ import SectionAIdentitas from "./components/step2-sections/SectionAIdentitas";
 import SectionBContact from "./components/step2-sections/SectionBContact";
 import SectionCBadanUsaha from "./components/step2-sections/SectionCBadanUsaha";
 import SectionDInformasiLainnya from "./components/step2-sections/SectionDInformasiLainnya";
+import Step2Form from "./components/step2-sections/Step2Form";
 import Step3Review from "./components/Step3Review";
 import SubmissionModal from "@/src/components/SubmissionModal";
 
@@ -89,7 +90,7 @@ export default function NcageRegistrationView() {
         "surat_permohonan",
         "surat_pernyataan",
         "foto_kantor",
-        "ktp_direksi",
+        "sk_domisili",
         "akta_notaris",
         "sk_kemenkumham",
         "siup_nib",
@@ -196,14 +197,14 @@ export default function NcageRegistrationView() {
         "surat_permohonan",
         "surat_pernyataan",
         "foto_kantor",
-        "ktp_direksi",
+        "sk_domisili",
         "akta_notaris",
         "sk_kemenkumham",
         "siup_nib",
         "company_profile",
         "npwp_perusahaan",
         "surat_kuasa",
-        "letter_sam_gov",
+        "daftar_isian_sam",
       ];
 
       const uploadedPaths: Record<string, string> = {};
@@ -350,66 +351,94 @@ export default function NcageRegistrationView() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden mb-12 relative">
+    <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-2xl border border-gray-100 overflow-hidden mb-12 relative">
       {/* Dialog Already Registered */}
       {modalState === "already_registered" && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm" />
-          <div className="relative bg-white border border-gray-200 rounded-3xl w-full max-w-md p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <i className="ri-information-fill text-4xl text-blue-600"></i>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white border border-gray-100 rounded-[15px] w-full max-w-lg overflow-hidden shadow-xl px-10 py-14 text-center animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i className="ri-information-fill text-4xl text-amber-600"></i>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3">
               Pendaftaran Ditemukan
             </h2>
-            <p className="text-gray-600 mb-8">
-              Anda sudah melakukan pendaftaran NCAGE. Silakan pantau status
-              pengajuan Anda.
+            <p className="text-gray-500 text-sm leading-relaxed mb-8">
+              Anda sudah melakukan pendaftaran NCAGE.<br />
+              Silakan pantau status pengajuan Anda melalui halaman pantau status.
             </p>
             <button
               onClick={() => router.push("/pantau-status")}
-              className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
+              className="w-full py-4 px-4 bg-[#8a1515] hover:bg-[#6e1010] text-white font-medium rounded-[15px] transition-colors shadow-lg shadow-red-900/10 active:scale-95"
             >
-              Ke Halaman Pantau Status
+              Lanjut Pantau Status
             </button>
           </div>
         </div>
       )}
       <Stepper currentStep={getVisualStep(currentStep)} steps={NCAGE_STEPS} />
 
-      <div className="p-6 md:p-10 border-t border-gray-100 bg-white">
-        <FormProvider {...methods}>
+      <div className="p-6 md:p-10 bg-white">
+            <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {currentStep >= 2 && currentStep <= 5 && (
-              <div className="text-center mb-10 animate-in fade-in">
-                <h2 className="text-xl font-bold text-gray-800">
-                  Lengkapi Formulir Permintaan
-                </h2>
-              </div>
-            )}
-
             {/* AREA RENDER KOMPONEN */}
             <div className={currentStep === 1 ? "block" : "hidden"}>
-              <Step1Upload />
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Unified Box Header */}
+                <div className="bg-gray-50 px-6 pt-10 pb-8 rounded-t-2xl border border-gray-200 border-b-0 flex flex-col items-center text-center">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Unggah Dokumen Persyaratan
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-3">
+                    Pastikan semua dokumen dalam format yang sesuai dan terbaca dengan jelas.
+                  </p>
+                </div>
+
+                {/* Box Content Area */}
+                <div className="border border-gray-200 rounded-b-2xl p-8 md:p-10 bg-white shadow-sm">
+                  <Step1Upload />
+                </div>
+              </div>
             </div>
-            <div className={currentStep === 2 ? "block" : "hidden"}>
-              <SectionAIdentitas />
-            </div>
-            <div className={currentStep === 3 ? "block" : "hidden"}>
-              <SectionBContact />
-            </div>
-            <div className={currentStep === 4 ? "block" : "hidden"}>
-              <SectionCBadanUsaha />
-            </div>
-            <div className={currentStep === 5 ? "block" : "hidden"}>
-              <SectionDInformasiLainnya />
-            </div>
+
+            {currentStep >= 2 && currentStep <= 5 && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Unified Box Header */}
+                <div className="bg-gray-50 px-6 pt-10 pb-8 rounded-t-2xl border border-gray-200 border-b-0 flex flex-col items-center text-center">
+                  <span className="text-sm font-medium text-gray-500 mb-4">
+                    Lengkapi Formulir Permintaan
+                  </span>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {currentStep === 2 && "a. Identifikasi Entitas"}
+                    {currentStep === 3 && "b. Informasi Kontak"}
+                    {currentStep === 4 && "c. Detail Badan Usaha"}
+                    {currentStep === 5 && "d. Informasi Lainnya"}
+                  </h3>
+                </div>
+
+                {/* Box Content Area */}
+                <div className="border border-gray-200 rounded-b-2xl p-8 md:p-10 bg-white shadow-sm">
+                  <div className={currentStep === 2 ? "block" : "hidden"}>
+                    <SectionAIdentitas />
+                  </div>
+                  <div className={currentStep === 3 ? "block" : "hidden"}>
+                    <SectionBContact />
+                  </div>
+                  <div className={currentStep === 4 ? "block" : "hidden"}>
+                    <SectionCBadanUsaha />
+                  </div>
+                  <div className={currentStep === 5 ? "block" : "hidden"}>
+                    <SectionDInformasiLainnya />
+                  </div>
+                </div>
+              </div>
+            )}
             <div className={currentStep === 6 ? "block" : "hidden"}>
               <Step3Review />
             </div>
 
             {/* TOMBOL NAVIGASI BAWAH */}
-            <div className="mt-10 flex justify-between items-center border-t border-gray-100 pt-6">
+            <div className="mt-10 flex justify-between items-center">
               <button
                 type="button"
                 disabled={currentStep === 1}
