@@ -20,7 +20,7 @@ import SectionCBadanUsaha from "./components/step2-sections/SectionCBadanUsaha";
 import SectionDInformasiLainnya from "./components/step2-sections/SectionDInformasiLainnya";
 import Step2Form from "./components/step2-sections/Step2Form";
 import Step3Review from "./components/Step3Review";
-import SubmissionModal from "@/src/components/SubmissionModal";
+import SubmissionModal from "@/src/components/company/SubmissionModal";
 
 const NCAGE_STEPS: StepItem[] = [
   { id: 1, label: "Unggah Berkas", icon: "ri-file-upload-line" },
@@ -364,8 +364,10 @@ export default function NcageRegistrationView() {
               Pendaftaran Ditemukan
             </h2>
             <p className="text-gray-500 text-sm leading-relaxed mb-8">
-              Anda sudah melakukan pendaftaran NCAGE.<br />
-              Silakan pantau status pengajuan Anda melalui halaman pantau status.
+              Anda sudah melakukan pendaftaran NCAGE.
+              <br />
+              Silakan pantau status pengajuan Anda melalui halaman pantau
+              status.
             </p>
             <button
               onClick={() => router.push("/pantau-status")}
@@ -379,7 +381,7 @@ export default function NcageRegistrationView() {
       <Stepper currentStep={getVisualStep(currentStep)} steps={NCAGE_STEPS} />
 
       <div className="p-6 md:p-10 bg-white">
-            <FormProvider {...methods}>
+        <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* AREA RENDER KOMPONEN */}
             <div className={currentStep === 1 ? "block" : "hidden"}>
@@ -390,7 +392,8 @@ export default function NcageRegistrationView() {
                     Unggah Dokumen Persyaratan
                   </h3>
                   <p className="text-sm text-gray-500 mt-3">
-                    Pastikan semua dokumen dalam format yang sesuai dan terbaca dengan jelas.
+                    Pastikan semua dokumen dalam format yang sesuai dan terbaca
+                    dengan jelas.
                   </p>
                 </div>
 

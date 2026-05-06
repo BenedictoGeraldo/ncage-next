@@ -10,17 +10,14 @@ const ForgotPasswordPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic kirim email pemulihan di sini
     setIsSubmitted(true);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5EEE8] relative overflow-hidden">
-      {/* Background Ornaments */}
       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#B97A57]/20 rounded-full translate-x-1/3 -translate-y-1/3" />
       <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-[#B97A57]/10 rounded-full -translate-x-1/4 translate-y-1/4" />
 
-      {/* Header / Logo */}
       <div className="absolute top-6 left-10 flex items-center gap-3">
         <Image
           src="/logo-kemhan.png"
@@ -51,11 +48,12 @@ const ForgotPasswordPage = () => {
         <h2 className="text-center text-[#8B1E1E] font-semibold text-2xl mb-4 tracking-tight">
           Lupa Kata Sandi?
         </h2>
-        
+
         {!isSubmitted ? (
           <>
             <p className="text-center text-gray-500 font-medium text-base mb-10 px-4">
-              Masukkan alamat email Anda untuk menerima tautan pemulihan kata sandi.
+              Masukkan alamat email Anda untuk menerima tautan pemulihan kata
+              sandi.
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col">
@@ -90,7 +88,8 @@ const ForgotPasswordPage = () => {
               Tautan Terkirim!
             </p>
             <p className="text-gray-500 text-sm mb-8">
-              Silakan periksa kotak masuk email Anda ({email}) untuk melanjutkan pemulihan kata sandi.
+              Silakan periksa kotak masuk email Anda ({email}) untuk melanjutkan
+              pemulihan kata sandi.
             </p>
             <button
               onClick={() => setIsSubmitted(false)}
