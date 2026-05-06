@@ -22,22 +22,38 @@ interface NotificationDropdownProps {
   onMarkAllAsRead: () => void;
 }
 
-const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ 
-  isOpen, 
-  onClose, 
+const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
+  isOpen,
+  onClose,
   notifications,
   onMarkAsRead,
   onDelete,
-  onMarkAllAsRead
+  onMarkAllAsRead,
 }) => {
   const typeStyles = {
-    warning: { icon: "ri-error-warning-line", color: "text-amber-500", bg: "bg-amber-50" },
-    success: { icon: "ri-checkbox-circle-line", color: "text-emerald-500", bg: "bg-emerald-50" },
-    info: { icon: "ri-information-line", color: "text-blue-500", bg: "bg-blue-50" },
-    security: { icon: "ri-shield-keyhole-line", color: "text-purple-500", bg: "bg-purple-50" },
+    warning: {
+      icon: "ri-error-warning-line",
+      color: "text-amber-500",
+      bg: "bg-amber-50",
+    },
+    success: {
+      icon: "ri-checkbox-circle-line",
+      color: "text-emerald-500",
+      bg: "bg-emerald-50",
+    },
+    info: {
+      icon: "ri-information-line",
+      color: "text-blue-500",
+      bg: "bg-blue-50",
+    },
+    security: {
+      icon: "ri-shield-keyhole-line",
+      color: "text-purple-500",
+      bg: "bg-purple-50",
+    },
   };
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <AnimatePresence>
@@ -54,12 +70,16 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             {/* Header */}
             <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
               <div>
-                <h3 className="text-base font-bold text-gray-900">Notifikasi</h3>
+                <h3 className="text-base font-bold text-gray-900">
+                  Notifikasi
+                </h3>
                 <p className="text-[11px] font-medium text-gray-400 mt-1.5">
-                  {unreadCount > 0 ? `Ada ${unreadCount} pesan belum dibaca` : "Semua pesan sudah dibaca"}
+                  {unreadCount > 0
+                    ? `Ada ${unreadCount} pesan belum dibaca`
+                    : "Semua pesan sudah dibaca"}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={onMarkAllAsRead}
                 className="px-3 py-1.5 rounded-lg hover:bg-white hover:shadow-sm active:scale-95 transition-all flex items-center gap-2 text-[10px] font-bold text-gray-400 hover:text-[#5D3A3A] border border-transparent hover:border-gray-100"
               >
@@ -68,49 +88,52 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               </button>
             </div>
 
-            {/* List */}
             <div className="max-h-[450px] overflow-y-auto px-6 pt-6 pb-2 custom-scrollbar relative bg-white">
               {notifications.length > 0 ? (
                 <>
-                  {/* Timeline Connector Line */}
                   <div className="absolute left-[47px] top-10 bottom-10 w-0.5 bg-gray-100 z-0"></div>
 
                   <div className="space-y-8 relative z-10 pb-4">
                     {notifications.map((notif) => {
                       const style = typeStyles[notif.type];
                       return (
-                        <div 
-                          key={notif.id} 
+                        <div
+                          key={notif.id}
                           onClick={() => onMarkAsRead(notif.id)}
                           className="flex gap-5 group cursor-pointer relative"
                         >
-                          {/* Icon with Circle */}
                           <div className="shrink-0 relative">
-                            <div className={`w-11 h-11 rounded-full ${style.bg} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative`}>
-                              <i className={`${style.icon} ${style.color} text-xl`}></i>
+                            <div
+                              className={`w-11 h-11 rounded-full ${style.bg} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative`}
+                            >
+                              <i
+                                className={`${style.icon} ${style.color} text-xl`}
+                              ></i>
                               {!notif.isRead && (
                                 <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-600 rounded-full border-2 border-white animate-pulse"></span>
                               )}
                             </div>
                           </div>
 
-                          {/* Content */}
                           <div className="flex-1 min-w-0 pt-1 pr-12">
                             <div className="flex items-center justify-between mb-1">
-                              <p className={`text-[13px] font-bold ${notif.isRead ? "text-gray-900" : "text-[#86000D]"} truncate transition-colors`}>
+                              <p
+                                className={`text-[13px] font-bold ${notif.isRead ? "text-gray-900" : "text-[#86000D]"} truncate transition-colors`}
+                              >
                                 {notif.title}
                               </p>
                               <span className="text-[10px] font-bold text-gray-400 shrink-0 uppercase ml-2">
                                 {notif.timestamp}
                               </span>
                             </div>
-                            <p className={`text-xs ${notif.isRead ? "text-gray-400" : "text-gray-600"} leading-relaxed font-medium line-clamp-2 transition-colors`}>
+                            <p
+                              className={`text-xs ${notif.isRead ? "text-gray-400" : "text-gray-600"} leading-relaxed font-medium line-clamp-2 transition-colors`}
+                            >
                               {notif.description}
                             </p>
                           </div>
 
-                          {/* Actions Bar (Hover) */}
-                          <button 
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               onDelete(notif.id);
@@ -130,18 +153,21 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                   <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
                     <i className="ri-notification-off-line text-2xl text-gray-300"></i>
                   </div>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-tight">Tidak ada notifikasi</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-tight">
+                    Tidak ada notifikasi
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* Footer */}
-            <Link 
-              href="/notifications" 
+            <Link
+              href="/notifications"
               onClick={onClose}
               className="block w-full py-3 text-center bg-gray-50/50 hover:bg-gray-100/80 border-t border-gray-50 transition-colors"
             >
-              <span className="text-[11px] font-extrabold text-[#86000D] uppercase tracking-wider">Lihat Semua</span>
+              <span className="text-[11px] font-extrabold text-[#86000D] uppercase tracking-wider">
+                Lihat Semua
+              </span>
             </Link>
           </motion.div>
         </>
