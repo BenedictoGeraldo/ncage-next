@@ -65,3 +65,4 @@ Folder `src/app` adalah pusat routing dan layout (App Router).
 - **`src/services/`**: layer komunikasi ke API (fetcher, client, wrapper endpoint)
 - **`src/stores/`**: state management (kalau nanti pakai Zustand/Redux/dll)
 - **`src/types/`**: tipe TypeScript (DTO, interface domain, dsb.)
+- **`src/features/`**: Features. berisi component khusus untuk halaman tertentu
