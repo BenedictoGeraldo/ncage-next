@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Geist } from "next/font/google";
 import "./globals.css";
 import "remixicon/fonts/remixicon.css";
+import { cn } from "@/src/lib/utils";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -11,7 +14,8 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "NCAGE Indonesia | Pelayanan NCAGE Pusat Kodifikasi",
-  description: "Platform digital resmi untuk pendaftaran dan pemantauan status kode NCAGE Indonesia secara terintegrasi.",
+  description:
+    "Platform digital resmi untuk pendaftaran dan pemantauan status kode NCAGE Indonesia secara terintegrasi.",
 };
 
 export const viewport = {
@@ -26,7 +30,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${poppins.variable} antialiased`}>
+    <html
+      lang="en"
+      className={cn(
+        "antialiased",
+        poppins.variable,
+        "font-sans",
+        geist.variable,
+      )}
+    >
       <body className="font-sans overflow-x-hidden">{children}</body>
     </html>
   );

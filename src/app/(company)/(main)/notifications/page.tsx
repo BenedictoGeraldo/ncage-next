@@ -154,19 +154,16 @@ export default function NotificationsPage() {
                     onClick={() => markAsRead(notif.id)}
                     className={`group relative flex items-start gap-6 p-8 transition-all cursor-pointer hover:bg-gray-50/50 ${notif.isRead ? "" : "bg-[#86000D]/1"}`}
                   >
-                    {/* Status Indicator */}
                     {!notif.isRead && (
                       <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#86000D]"></div>
                     )}
 
-                    {/* Icon */}
                     <div
                       className={`w-14 h-14 shrink-0 rounded-[15px] flex items-center justify-center ${style.bg} ${style.color} border ${style.border} shadow-sm group-hover:scale-105 transition-transform duration-300`}
                     >
                       <i className={`${style.icon} text-2xl`}></i>
                     </div>
 
-                    {/* Content */}
                     <div className="flex-1 min-w-0 pt-1">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">

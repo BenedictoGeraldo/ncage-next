@@ -13,7 +13,6 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#F5EEE8] relative pt-32 pb-20 px-4">
-      {/* Background Ornaments - Wrapped to prevent height extension */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#B97A57]/20 rounded-full translate-x-1/3 -translate-y-1/3" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#B97A57]/20 rounded-full -translate-x-1/3 translate-y-1/3" />
@@ -22,13 +21,14 @@ const RegisterPage = () => {
       <div className="absolute top-8 left-10 flex items-center gap-3 z-20">
         <Image src="/logo-kemhan.png" alt="Logo" width={55} height={55} />
         <div>
-          <h1 className="font-semibold text-black text-lg leading-tight">Pelayanan NCAGE</h1>
+          <h1 className="font-semibold text-black text-lg leading-tight">
+            Pelayanan NCAGE
+          </h1>
           <p className="text-sm text-[#374151]">Pusat Kodifikasi</p>
         </div>
       </div>
 
       <div className="bg-white w-full max-w-5xl p-10 sm:p-14 rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-10 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out border border-white/50">
-        {/* Header Section - Centered with better Gap */}
         <div className="relative mb-14 text-center">
           <Link
             href="/login"
@@ -41,16 +41,19 @@ const RegisterPage = () => {
               Buat Akun Layanan NCAGE
             </h2>
             <p className="text-[#374151] font-normal text-sm mx-auto leading-relaxed opacity-80">
-              Silakan lengkapi data berikut untuk membuat akun pendaftaran NCAGE Anda.
+              Silakan lengkapi data berikut untuk membuat akun pendaftaran NCAGE
+              Anda.
             </p>
           </div>
         </div>
 
         <form action={register} className="flex flex-col">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-            {/* Full Name Field */}
             <div className="space-y-2">
-              <label htmlFor="fullName" className="block text-sm font-medium text-[#374151] ml-1">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-[#374151] ml-1"
+              >
                 Nama Lengkap (PIC)
               </label>
               <div className="relative group">
@@ -68,9 +71,11 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Email Field */}
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-[#374151] ml-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-[#374151] ml-1"
+              >
                 Email
               </label>
               <div className="relative group">
@@ -88,9 +93,11 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Company Field */}
             <div className="space-y-2">
-              <label htmlFor="company" className="block text-sm font-medium text-[#374151] ml-1">
+              <label
+                htmlFor="company"
+                className="block text-sm font-medium text-[#374151] ml-1"
+              >
                 Nama Perusahaan
               </label>
               <div className="relative group">
@@ -108,9 +115,11 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Phone/WhatsApp Field */}
             <div className="space-y-2">
-              <label htmlFor="phone" className="block text-sm font-medium text-[#374151] ml-1">
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-[#374151] ml-1"
+              >
                 Nomor Telepon (WhatsApp)
               </label>
               <div className="relative group">
@@ -128,9 +137,11 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-[#374151] ml-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-[#374151] ml-1"
+              >
                 Kata Sandi
               </label>
               <div className="relative group">
@@ -138,7 +149,9 @@ const RegisterPage = () => {
                   {password.length > 5 ? (
                     <i className="ri-checkbox-circle-fill text-xl text-green-500 animate-in zoom-in"></i>
                   ) : (
-                    <i className={`${showPassword ? 'ri-lock-unlock-line' : 'ri-lock-line'} text-xl ${password.length > 0 ? 'text-[#8B1E1E]' : 'text-gray-400/40'}`}></i>
+                    <i
+                      className={`${showPassword ? "ri-lock-unlock-line" : "ri-lock-line"} text-xl ${password.length > 0 ? "text-[#8B1E1E]" : "text-gray-400/40"}`}
+                    ></i>
                   )}
                 </div>
                 <input
@@ -156,22 +169,29 @@ const RegisterPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B1E1E] transition-colors"
                 >
-                  <i className={showPassword ? "ri-eye-line" : "ri-eye-off-line"}></i>
+                  <i
+                    className={showPassword ? "ri-eye-line" : "ri-eye-off-line"}
+                  ></i>
                 </button>
               </div>
             </div>
 
-            {/* Confirm Password Field */}
             <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#374151] ml-1">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-[#374151] ml-1"
+              >
                 Konfirmasi Kata Sandi
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors flex items-center gap-1">
-                  {confirmPassword.length > 0 && confirmPassword === password ? (
+                  {confirmPassword.length > 0 &&
+                  confirmPassword === password ? (
                     <i className="ri-checkbox-circle-fill text-xl text-green-500 animate-in zoom-in"></i>
                   ) : (
-                    <i className={`${showConfirmPassword ? 'ri-lock-unlock-line' : 'ri-lock-line'} text-xl ${confirmPassword.length > 0 ? 'text-[#8B1E1E]' : 'text-gray-400/40'}`}></i>
+                    <i
+                      className={`${showConfirmPassword ? "ri-lock-unlock-line" : "ri-lock-line"} text-xl ${confirmPassword.length > 0 ? "text-[#8B1E1E]" : "text-gray-400/40"}`}
+                    ></i>
                   )}
                 </div>
                 <input
@@ -189,7 +209,11 @@ const RegisterPage = () => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B1E1E] transition-colors"
                 >
-                  <i className={showConfirmPassword ? "ri-eye-line" : "ri-eye-off-line"}></i>
+                  <i
+                    className={
+                      showConfirmPassword ? "ri-eye-line" : "ri-eye-off-line"
+                    }
+                  ></i>
                 </button>
               </div>
             </div>
@@ -206,7 +230,15 @@ const RegisterPage = () => {
               htmlFor="tnc"
               className="text-sm text-[#374151] cursor-pointer font-medium opacity-80"
             >
-              Saya menyetujui <span className="text-[#8B1E1E] font-bold">syarat dan ketentuan</span> serta <span className="text-[#8B1E1E] font-bold">kebijakan privasi</span>.
+              Saya menyetujui{" "}
+              <span className="text-[#8B1E1E] font-bold">
+                syarat dan ketentuan
+              </span>{" "}
+              serta{" "}
+              <span className="text-[#8B1E1E] font-bold">
+                kebijakan privasi
+              </span>
+              .
             </label>
           </div>
 
@@ -219,7 +251,10 @@ const RegisterPage = () => {
             </button>
             <p className="text-[#374151] text-sm font-medium opacity-70">
               Sudah Punya Akun?{" "}
-              <Link href="/login" className="text-[#8B1E1E] font-bold hover:opacity-80 transition-opacity">
+              <Link
+                href="/login"
+                className="text-[#8B1E1E] font-bold hover:opacity-80 transition-opacity"
+              >
                 Masuk ke Akun
               </Link>
             </p>
