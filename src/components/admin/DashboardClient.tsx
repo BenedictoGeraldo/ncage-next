@@ -171,7 +171,7 @@ function IndonesiaMap({
   }, []);
 
   const getFill = (count: number) => {
-    if (count === 0) return "#E2E8F0";
+    if (count === 0) return "#90913d";
     const t = count / Math.max(maxCount, 1);
     if (t >= 0.75) return "#7F1D1D";
     if (t >= 0.5) return "#B91C1C";
@@ -572,7 +572,7 @@ export default function DashboardClient({ data }: Props) {
         <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
           <div>
             <h2 className="text-[14px] font-bold text-gray-800">
-              Persebaran Perusahaan NCAGE
+              Persebaran Perusahaan Pemegang Kode NCAGE
             </h2>
             <p className="text-[11px] text-gray-400 mt-0.5">
               Per provinsi, berdasarkan kode NCAGE aktif
@@ -580,7 +580,7 @@ export default function DashboardClient({ data }: Props) {
           </div>
           <div className="flex items-center gap-4 text-[11px] font-semibold text-gray-500 flex-wrap">
             {[
-              { label: "Tidak ada", color: "#E2E8F0", border: true },
+              { label: "Tidak ada", color: "#90913d", border: true },
               { label: "Rendah", color: "#FCA5A5" },
               { label: "Sedang", color: "#EF4444" },
               { label: "Tinggi", color: "#B91C1C" },
