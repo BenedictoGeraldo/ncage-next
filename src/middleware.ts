@@ -4,6 +4,7 @@ const PROTECTED_PATHS = [
   "/pendaftaran-ncage",
   "/pantau-status",
   "/notifications",
+  "/admin",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -11,6 +12,10 @@ export async function middleware(request: NextRequest) {
 
   if (pathname === "/") {
     return NextResponse.redirect(new URL("/beranda", request.url));
+  }
+
+  if (pathname.startsWith("/admin/login")) {
+    return NextResponse.next();
   }
 
   const isProtected = PROTECTED_PATHS.some(
@@ -49,6 +54,9 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    if (pathname.startsWith("/admin")) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -61,5 +69,6 @@ export const config = {
     "/pendaftaran-ncage/:path*",
     "/pantau-status/:path*",
     "/notifications/:path*",
+    "/admin/:path*",
   ],
 };

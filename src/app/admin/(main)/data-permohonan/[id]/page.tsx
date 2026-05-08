@@ -1,291 +1,178 @@
-"use client";
+import { notFound } from "next/navigation";
+import { createAdminClient } from "@/src/utils/supabase/admin";
+import type { PermohonanDetail } from "@/src/types/permohonan";
+import { DetailPermohonanClient } from "./DetailPermohonanClient";
 
-import { notFound, useRouter } from "next/navigation";
-import { use, useState } from "react";
-import Link from "next/link";
-import {
-  getPermohonanById,
-  type StatusPermohonan,
-} from "@/src/data/fake-db/admin/DataPermohonan";
+async function getPermohonanDetail(
+  id: string,
+): Promise<PermohonanDetail | null> {
+  const supabase = createAdminClient();
 
-const statusConfig: Record<
-  StatusPermohonan,
-  { label: string; className: string; icon: string }
-> = {
-  "Menunggu Verifikasi": {
-    label: "Menunggu Verifikasi",
-    className: "bg-gray-100 text-gray-600",
-    icon: "ri-time-line",
-  },
-  "Sedang Diverifikasi": {
-    label: "Sedang Diverifikasi",
-    className: "bg-amber-100 text-amber-700",
-    icon: "ri-loader-4-line",
-  },
-  Disetujui: {
-    label: "Disetujui",
-    className: "bg-emerald-100 text-emerald-700",
-    icon: "ri-checkbox-circle-line",
-  },
-  Revisi: {
-    label: "Revisi",
-    className: "bg-orange-100 text-orange-700",
-    icon: "ri-error-warning-line",
-  },
-  Ditolak: {
-    label: "Ditolak",
-    className: "bg-red-100 text-red-600",
-    icon: "ri-close-circle-line",
-  },
-};
+  const { data, error } = await supabase
+    .from("ncage_applications")
+    .select(
+      `
+      id,
+      created_at,
+      status_id,
+      revision_notes,
+      ncage_code,
+      documents,
+      statuses ( name ),
+      application_identities (
+        submission_date,
+        application_type,
+        ncage_request_type,
+        purpose,
+        entity_type,
+        building_ownership_status,
+        is_ahu_registered,
+        office_coordinate,
+        nib,
+        npwp,
+        business_field
+      ),
+      application_contacts (
+        name,
+        identity_number,
+        address,
+        phone_number,
+        email,
+        position
+      ),
+      company_details (
+        name,
+        province,
+        city,
+        street,
+        postal_code,
+        po_box,
+        phone,
+        fax,
+        email,
+        website,
+        affiliate
+      ),
+      other_informations (
+        products,
+        production_capacity,
+        number_of_employees,
+        branch_office_name,
+        branch_office_street,
+        branch_office_city,
+        branch_office_postal_code,
+        affiliate_company,
+        affiliate_company_street,
+        affiliate_company_city,
+        affiliate_company_postal_code
+      )
+    `,
+    )
+    .eq("id", id)
+    .single();
 
-function SectionCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/60">
-        <h2 className="text-[13px] font-bold text-gray-700 uppercase tracking-widest">
-          {title}
-        </h2>
-      </div>
-      <div className="px-6 py-5">{children}</div>
-    </div>
-  );
+  if (error || !data) {
+    console.error("[getPermohonanDetail] Error:", error?.message);
+    return null;
+  }
+
+  const identity = Array.isArray(data.application_identities)
+    ? data.application_identities[0]
+    : data.application_identities;
+  const contact = Array.isArray(data.application_contacts)
+    ? data.application_contacts[0]
+    : data.application_contacts;
+  const company = Array.isArray(data.company_details)
+    ? data.company_details[0]
+    : data.company_details;
+  const other = Array.isArray(data.other_informations)
+    ? data.other_informations[0]
+    : data.other_informations;
+  const status = Array.isArray(data.statuses)
+    ? data.statuses[0]
+    : data.statuses;
+
+  const rawDocuments = (data.documents as Record<string, string>) ?? {};
+  const signedDocuments: Record<string, string> = {};
+
+  const paths = Object.values(rawDocuments);
+  if (paths.length > 0) {
+    const { data: signedData, error: signedError } = await supabase.storage
+      .from("ncage_documents")
+      .createSignedUrls(paths, 3600);
+
+    if (!signedError && signedData) {
+      const urlMap = new Map(signedData.map((d) => [d.path, d.signedUrl]));
+
+      for (const [key, path] of Object.entries(rawDocuments)) {
+        signedDocuments[key] = urlMap.get(path) ?? "";
+      }
+    }
+  }
+
+  return {
+    id: data.id,
+    created_at: data.created_at ?? "",
+    status_id: data.status_id ?? 1,
+    status_name: status?.name ?? "Permohonan Dikirim",
+    revision_notes: data.revision_notes ?? null,
+    ncage_code: data.ncage_code ?? null,
+    documents: signedDocuments,
+
+    submission_date: identity?.submission_date ?? null,
+    application_type: identity?.application_type ?? null,
+    ncage_request_type: identity?.ncage_request_type ?? null,
+    purpose: identity?.purpose ?? null,
+    entity_type: identity?.entity_type ?? null,
+    building_ownership_status: identity?.building_ownership_status ?? null,
+    is_ahu_registered: identity?.is_ahu_registered ?? null,
+    office_coordinate: identity?.office_coordinate ?? null,
+    nib: identity?.nib ?? null,
+    npwp: identity?.npwp ?? null,
+    business_field: identity?.business_field ?? null,
+
+    nama_pemohon: contact?.name ?? null,
+    identity_number: contact?.identity_number ?? null,
+    address: contact?.address ?? null,
+    phone_number: contact?.phone_number ?? null,
+    email_pemohon: contact?.email ?? null,
+    position: contact?.position ?? null,
+
+    nama_perusahaan: company?.name ?? null,
+    province: company?.province ?? null,
+    city: company?.city ?? null,
+    street: company?.street ?? null,
+    postal_code: company?.postal_code ?? null,
+    po_box: company?.po_box ?? null,
+    phone_kantor: company?.phone ?? null,
+    fax: company?.fax ?? null,
+    email_kantor: company?.email ?? null,
+    website: company?.website ?? null,
+    affiliate: company?.affiliate ?? null,
+
+    products: other?.products ?? null,
+    production_capacity: other?.production_capacity ?? null,
+    number_of_employees: other?.number_of_employees ?? null,
+    branch_office_name: other?.branch_office_name ?? null,
+    branch_office_street: other?.branch_office_street ?? null,
+    branch_office_city: other?.branch_office_city ?? null,
+    branch_office_postal_code: other?.branch_office_postal_code ?? null,
+    affiliate_company: other?.affiliate_company ?? null,
+    affiliate_company_street: other?.affiliate_company_street ?? null,
+    affiliate_company_city: other?.affiliate_company_city ?? null,
+    affiliate_company_postal_code: other?.affiliate_company_postal_code ?? null,
+  };
 }
 
-function Field({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-        {label}
-      </p>
-      <p className="text-[14px] text-gray-800 font-medium">
-        {value || <span className="text-gray-300 font-normal">—</span>}
-      </p>
-    </div>
-  );
-}
-
-export default function DetailPermohonanPage({
+export default async function DetailPermohonanPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
-  const router = useRouter();
-  const data = getPermohonanById(id);
-
-  const [selectedDoc, setSelectedDoc] = useState<string>("");
+  const { id } = await params;
+  const data = await getPermohonanDetail(id);
 
   if (!data) return notFound();
 
-  const statusCfg = statusConfig[data.status];
-  const availableDocs = data.dokumen.filter((d) => d.url !== null);
-
-  return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-1.5 text-[12px] text-gray-400 mb-2">
-            <Link
-              href="/admin/data-permohonan"
-              className="hover:text-[#8B1E1E] transition-colors"
-            >
-              Data Permohonan
-            </Link>
-            <i className="ri-arrow-right-s-line" />
-            <span className="text-gray-600 font-medium">{id}</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Detail NCAGE — {data.nama_perusahaan}
-          </h1>
-        </div>
-
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B1E1E] text-white text-[13px] font-semibold hover:bg-[#6e1818] active:scale-95 transition-all shadow-sm shadow-[#8B1E1E]/20 shrink-0"
-        >
-          <i className="ri-arrow-left-line" />
-          Kembali
-        </button>
-      </div>
-
-      <SectionCard title="Status Permohonan">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-5">
-          <Field label="Nama Pemohon" value={data.nama_pemohon} />
-
-          <div className="flex flex-col gap-1">
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-              Status
-            </p>
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold w-fit ${statusCfg.className}`}
-            >
-              <i className={statusCfg.icon} />
-              {statusCfg.label}
-            </span>
-          </div>
-
-          <Field label="Diverifikasi Oleh" value={data.diverifikasi_oleh} />
-          <Field label="Divalidasi Oleh" value={data.divalidasi_oleh} />
-          <Field label="Diminta Revisi Oleh" value={data.diminta_revisi_oleh} />
-          <Field label="Ditolak Oleh" value={data.ditolak_oleh} />
-        </div>
-      </SectionCard>
-
-      <SectionCard title="Dokumen Terlampir">
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {data.dokumen.map((doc) => (
-              <div
-                key={doc.nama}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-[13px] font-medium transition-all ${
-                  doc.url
-                    ? "border-emerald-200 bg-emerald-50/50 text-emerald-700"
-                    : "border-gray-100 bg-gray-50 text-gray-400"
-                }`}
-              >
-                <i
-                  className={`${doc.url ? "ri-file-check-line" : "ri-file-line"} text-base shrink-0`}
-                />
-                <span className="truncate">{doc.label}</span>
-                {doc.url && (
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-auto shrink-0 text-emerald-600 hover:text-emerald-800 transition-colors"
-                    title="Lihat dokumen"
-                  >
-                    <i className="ri-external-link-line text-sm" />
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-3 border-t border-gray-100">
-            <p className="text-[12px] font-semibold text-gray-500 mb-2">
-              Preview Dokumen
-            </p>
-            <select
-              value={selectedDoc}
-              onChange={(e) => setSelectedDoc(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]/10 focus:border-[#8B1E1E] transition-all mb-3"
-            >
-              <option value="">— Pilih dokumen —</option>
-              {availableDocs.map((doc) => (
-                <option key={doc.nama} value={doc.url ?? ""}>
-                  {doc.label}
-                </option>
-              ))}
-            </select>
-
-            {selectedDoc ? (
-              <iframe
-                src={selectedDoc}
-                className="w-full h-[480px] rounded-xl border border-gray-200 bg-gray-50"
-                title="Preview Dokumen"
-              />
-            ) : (
-              <div className="w-full h-28 rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
-                <p className="text-[13px] text-gray-400">
-                  Belum ada dokumen yang dipilih.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </SectionCard>
-
-      <SectionCard title="A. Identifikasi Entitas">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5">
-          <Field
-            label="Tanggal Pengajuan"
-            value={new Date(data.tanggal_pengajuan).toLocaleDateString(
-              "id-ID",
-              { day: "2-digit", month: "long", year: "numeric" },
-            )}
-          />
-          <Field label="Jenis Permohonan" value={data.jenis_permohonan} />
-          <div />
-          <Field label="Jenis Permohonan NCAGE" value={data.jenis_ncage} />
-          <Field label="Tujuan Penerbitan" value={data.tujuan_penerbitan} />
-          <Field label="Tipe Entitas" value={data.tipe_entitas} />
-          <Field
-            label="Status Kepemilikan Bangunan"
-            value={data.status_kepemilikan}
-          />
-          <Field label="AHU Terdaftar" value={data.is_ahu_registered} />
-          <Field label="Koordinat Kantor" value={data.koordinat_kantor} />
-          <Field label="NIB" value={data.nib} />
-          <Field label="NPWP" value={data.npwp} />
-          <Field label="Bidang Usaha" value={data.bidang_usaha} />
-        </div>
-      </SectionCard>
-
-      <SectionCard title="B. Narahubung">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5">
-          <Field label="Nama" value={data.nama_pemohon} />
-          <Field label="Nomor Identitas" value={data.nomor_identitas} />
-          <Field label="Alamat" value={data.alamat_pemohon} />
-          <Field label="Nomor Telepon" value={data.no_hp_pemohon} />
-          <Field label="Email" value={data.email_pemohon} />
-          <Field label="Jabatan" value={data.jabatan_pemohon} />
-        </div>
-      </SectionCard>
-
-      <SectionCard title="C. Detail Badan Usaha">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5">
-          <Field label="Nama Perusahaan" value={data.nama_perusahaan} />
-          <Field label="Provinsi" value={data.provinsi} />
-          <Field label="Kota" value={data.kota} />
-          <Field label="Jalan" value={data.alamat_kantor} />
-          <Field label="Kode Pos" value={data.kode_pos} />
-          <Field label="PO Box" value={data.po_box} />
-          <Field label="Nomor Telepon" value={data.no_telepon_kantor} />
-          <Field label="Fax" value={data.no_fax_kantor} />
-          <Field label="Email" value={data.email_kantor} />
-          <Field label="Website" value={data.website_kantor} />
-          <Field label="Perusahaan Afiliasi" value={data.perusahaan_afiliasi} />
-        </div>
-      </SectionCard>
-
-      <SectionCard title="D. Informasi Lainnya">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5">
-          <Field label="Produk" value={data.produk_dihasilkan} />
-          <Field label="Kapasitas Produksi" value={data.kemampuan_produksi} />
-          <Field label="Jumlah Karyawan" value={data.jumlah_karyawan} />
-          <Field label="Nama Cabang" value={data.kantor_cabang} />
-          <Field label="Jalan Cabang" value={data.jalan_cabang} />
-          <Field label="Kota Cabang" value={data.kota_cabang} />
-          <Field label="Kode Pos Cabang" value={data.kode_pos_cabang} />
-          <Field
-            label="Perusahaan Afiliasi"
-            value={data.perusahaan_afiliasi_info}
-          />
-          <Field
-            label="Jalan Perusahaan Afiliasi"
-            value={data.jalan_afiliasi}
-          />
-          <Field label="Kota Perusahaan Afiliasi" value={data.kota_afiliasi} />
-          <Field
-            label="Kode Pos Perusahaan Afiliasi"
-            value={data.kode_pos_afiliasi}
-          />
-        </div>
-      </SectionCard>
-    </div>
-  );
+  return <DetailPermohonanClient data={data} />;
 }

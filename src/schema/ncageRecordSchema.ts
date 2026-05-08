@@ -1,0 +1,37 @@
+import { z } from "zod";
+
+export const ncageRecordSchema = z.object({
+  ncage_code: z.string().min(1, "Ncage code wajib diisi"),
+  ncagesd: z.string().optional(),
+  toec: z.string().optional(),
+  entity_name: z.string().min(1, "Entity name wajib diisi"),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  psc: z.string().optional(),
+  country: z.string().optional(),
+  ctr: z.string().optional(),
+  stt: z.string().optional(),
+  ste: z.string().optional(),
+  is_sam_requested: z.boolean().default(false),
+  remarks: z.string().optional(),
+  national: z.string().optional(),
+  nac: z.string().optional(),
+  idn: z.string().optional(),
+  bar: z.string().optional(),
+  nai: z.string().optional(),
+  cpv: z.string().optional(),
+  uns: z.string().optional(),
+  sic: z.string().optional(),
+  tel: z.string().optional(),
+  fax: z.string().optional(),
+  ema: z.string().optional(),
+  www: z.string().optional(),
+  pob: z.string().optional(),
+  pcc: z.string().optional(),
+  pcs: z.string().optional(),
+  rp1_5: z.string().optional(),
+  nmcrl_ref_count: z.preprocess((val) => Number(val), z.number()).optional(),
+  ncage_application_id: z.string().optional(),
+});
+
+export type NcageRecordFormValues = z.infer<typeof ncageRecordSchema>;
