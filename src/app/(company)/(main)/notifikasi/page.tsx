@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { createClient } from "@/src/utils/supabase/client";
 
 interface Notification {
   id: string;
@@ -9,69 +10,72 @@ interface Notification {
   title: string;
   description: string;
   timestamp: string;
-  isRead: boolean;
   date: string;
+  isRead: boolean;
 }
 
-const mockAllNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "warning",
-    title: "Masa Berlaku NCAGE Akan Habis",
-    description:
-      "Kode NCAGE Anda akan berakhir dalam 30 hari. Segera lakukan perpanjangan melalui menu pendaftaran ulang.",
-    timestamp: "2 jam yang lalu",
-    date: "05 Mei 2026",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "success",
-    title: "Pengajuan Disetujui",
-    description:
-      "Selamat! Pengajuan NCAGE nomor NCG_0002042026 telah disetujui oleh tim verifikator Puskod Kemhan.",
-    timestamp: "1 hari yang lalu",
-    date: "04 Mei 2026",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "info",
-    title: "Sertifikat Bisa Diunduh",
-    description:
-      "Sertifikat NCAGE Anda sudah tersedia dalam format digital dan dapat diunduh melalui dashboard Pantau Status.",
-    timestamp: "3 hari yang lalu",
-    date: "02 Mei 2026",
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "security",
-    title: "Pembaruan Kata Sandi",
-    description:
-      "Kata sandi akun Anda telah berhasil diperbarui demi menjaga keamanan data perusahaan Anda.",
-    timestamp: "1 minggu yang lalu",
-    date: "28 Apr 2026",
-    isRead: true,
-  },
-  {
-    id: "5",
-    type: "info",
-    title: "Update Profil Berhasil",
-    description:
-      "Data profil perusahaan Anda telah diperbarui sesuai dengan dokumen NIB terbaru.",
-    timestamp: "2 minggu yang lalu",
-    date: "21 Apr 2026",
-    isRead: true,
-  },
-];
-
 export default function NotificationsPage() {
+  const supabase = createClient();
   const [filter, setFilter] = useState<"all" | "unread">("all");
-  const [notifications, setNotifications] = useState(mockAllNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchNotifications = useCallback(async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user) return;
+
+    const { data } = await supabase
+      .from("notifications")
+      .select("id, type, title, description, is_read, created_at")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false });
+
+    if (data) {
+      setNotifications(
+        data.map((n) => ({
+          id: n.id,
+          type: n.type as Notification["type"],
+          title: n.title,
+          description: n.description,
+          isRead: n.is_read,
+          timestamp: new Date(n.created_at).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          date: new Date(n.created_at).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+        })),
+      );
+    }
+    setIsLoading(false);
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const filteredNotifs =
     filter === "all" ? notifications : notifications.filter((n) => !n.isRead);
+
+  const markAsRead = async (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
+    );
+    await supabase.from("notifications").update({ is_read: true }).eq("id", id);
+  };
+
+  const deleteNotif = async (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    await supabase.from("notifications").delete().eq("id", id);
+  };
 
   const typeStyles = {
     warning: {
@@ -100,20 +104,9 @@ export default function NotificationsPage() {
     },
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
-  };
-
-  const deleteNotif = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
   return (
     <div className="bg-[#FDFDFD] min-h-screen pt-14 pb-20 px-6 md:px-12 lg:px-20">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 pl-4 md:pl-8">
           <div className="space-y-3">
             <h1 className="text-4xl font-extrabold text-gray-900">
@@ -139,10 +132,16 @@ export default function NotificationsPage() {
           </div>
         </div>
 
-        {/* Notifications Container Box */}
         <div className="bg-white rounded-[15px] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden min-h-100">
           <div className="divide-y divide-gray-50">
-            {filteredNotifs.length > 0 ? (
+            {isLoading ? (
+              <div className="py-32 flex flex-col items-center justify-center gap-4">
+                <div className="w-10 h-10 border-4 border-[#86000D]/20 border-t-[#86000D] rounded-full animate-spin" />
+                <p className="text-sm text-gray-400 font-medium">
+                  Memuat notifikasi...
+                </p>
+              </div>
+            ) : filteredNotifs.length > 0 ? (
               filteredNotifs.map((notif, index) => {
                 const style = typeStyles[notif.type];
                 return (
@@ -152,7 +151,7 @@ export default function NotificationsPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => markAsRead(notif.id)}
-                    className={`group relative flex items-start gap-6 p-8 transition-all cursor-pointer hover:bg-gray-50/50 ${notif.isRead ? "" : "bg-[#86000D]/1"}`}
+                    className={`group relative flex items-start gap-6 p-8 transition-all cursor-pointer hover:bg-gray-50/50 ${notif.isRead ? "" : "bg-[#86000D]/[0.01]"}`}
                   >
                     {!notif.isRead && (
                       <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#86000D]"></div>

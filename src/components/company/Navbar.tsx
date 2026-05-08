@@ -9,45 +9,6 @@ import { createClient } from "@/src/utils/supabase/client";
 import LogoutModal from "./LogoutModal";
 import NotificationDropdown, { Notification } from "./NotificationDropdown";
 
-const initialNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "warning",
-    title: "Masa Berlaku NCAGE Akan Habis",
-    description:
-      "Kode NCAGE Anda akan berakhir dalam 30 hari. Segera lakukan perpanjangan.",
-    timestamp: "2 jam yang lalu",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "success",
-    title: "Pengajuan Disetujui",
-    description:
-      "Selamat! Pengajuan NCAGE nomor NCG_0002042026 telah disetujui.",
-    timestamp: "1 hari yang lalu",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "info",
-    title: "Sertifikat Bisa Diunduh",
-    description:
-      "Sertifikat NCAGE Anda sudah tersedia dan dapat diunduh sekarang.",
-    timestamp: "3 hari yang lalu",
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "security",
-    title: "Pembaruan Kata Sandi",
-    description:
-      "Kata sandi akun Anda telah berhasil diperbarui demi keamanan.",
-    timestamp: "1 minggu yang lalu",
-    isRead: true,
-  },
-];
-
 const navLinks = [
   { label: "Beranda", href: "/beranda" },
   { label: "Pendaftaran NCAGE", href: "/pendaftaran-ncage" },
@@ -67,8 +28,7 @@ const Navbar = () => {
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [notifications, setNotifications] =
-    useState<Notification[]>(initialNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const router = useRouter();
 
@@ -89,6 +49,35 @@ const Navbar = () => {
     }
   };
 
+  const fetchNotifications = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
+
+    const { data } = await supabase
+      .from("notifications")
+      .select("id, type, title, description, is_read, created_at")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (data) {
+      setNotifications(
+        data.map((n) => ({
+          id: n.id,
+          type: n.type as Notification["type"],
+          title: n.title,
+          description: n.description,
+          isRead: n.is_read,
+          timestamp: new Date(n.created_at).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+        }))
+      );
+    }
+  };
+
   useEffect(() => {
     if (!isBeranda) return;
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -102,7 +91,10 @@ const Navbar = () => {
         data: { session },
       } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
-      if (session) fetchUserData();
+      if (session) {
+        fetchUserData();
+        fetchNotifications();
+      }
     };
     checkSession();
 
@@ -110,8 +102,13 @@ const Navbar = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(!!session);
-      if (session) fetchUserData();
-      else setUserData(null);
+      if (session) {
+        fetchUserData();
+        fetchNotifications();
+      } else {
+        setUserData(null);
+        setNotifications([]);
+      }
     });
 
     window.addEventListener("profileUpdated", fetchUserData);
@@ -135,18 +132,23 @@ const Navbar = () => {
     router.push("/login");
   };
 
-  const handleMarkAsRead = (id: string) => {
+  const handleMarkAsRead = async (id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
+    await supabase.from("notifications").update({ is_read: true }).eq("id", id);
   };
 
-  const handleDeleteNotif = (id: string) => {
+  const handleDeleteNotif = async (id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    await supabase.from("notifications").delete().eq("id", id);
   };
 
-  const handleMarkAllRead = () => {
+  const handleMarkAllRead = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    await supabase.from("notifications").update({ is_read: true }).eq("user_id", session.user.id);
   };
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;

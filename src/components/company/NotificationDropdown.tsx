@@ -67,7 +67,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
             className="absolute right-0 mt-3 w-[420px] bg-white rounded-[15px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-gray-100 z-20 origin-top-right overflow-hidden"
           >
-            {/* Header */}
             <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
               <div>
                 <h3 className="text-base font-bold text-gray-900">
@@ -161,7 +160,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             </div>
 
             <Link
-              href="/notifications"
+              href="/notifikasi"
               onClick={onClose}
               className="block w-full py-3 text-center bg-gray-50/50 hover:bg-gray-100/80 border-t border-gray-50 transition-colors"
             >
