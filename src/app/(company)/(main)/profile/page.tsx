@@ -118,6 +118,18 @@ export default function ProfilePage() {
 
       if (error) throw error;
 
+      try {
+        const adminSupabase = (
+          await import("@/src/utils/supabase/admin")
+        ).createAdminClient();
+        await adminSupabase.from("notifications").insert({
+          user_id: session.user.id,
+          type: "security",
+          title: "Profil Berhasil Diperbarui",
+          description: "Informasi profil akun Anda telah berhasil diperbarui.",
+        });
+      } catch (_) {}
+
       showToast(
         "success",
         "Berhasil Disimpan",
