@@ -14,7 +14,7 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5EEE8] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-32 pb-12 bg-[#F5EEE8] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#B97A57]/20 rounded-full translate-x-1/3 -translate-y-1/3" />
       <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-[#B97A57]/10 rounded-full -translate-x-1/4 translate-y-1/4" />
 
@@ -34,7 +34,7 @@ const ForgotPasswordPage = () => {
         </div>
       </div>
 
-      <div className="bg-[#FFFFFF] w-full max-w-[560px] p-10 sm:p-14 rounded-[32px] shadow-xl z-10 border border-gray-100 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out">
+      <div className="bg-[#FFFFFF] w-full max-w-[560px] p-10 sm:p-14 rounded-[15px] shadow-xl z-10 border border-gray-100 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out">
         <div className="mb-8">
           <Link
             href="/login"

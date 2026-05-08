@@ -207,16 +207,21 @@ export function DataTableNcageRecords({ data }: DataTableNcageRecordsProps) {
   });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5 mt-6">
       <div className="flex items-center justify-between gap-4">
         <div className="relative max-w-xs w-full">
-          <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[15px]" />
+          <i className="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[15px]" />
           <input
             type="text"
             placeholder="Cari kode / perusahaan..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]/10 focus:border-[#8B1E1E] transition-all"
+            className="
+              w-full pl-9.5 pr-4 py-2.5 text-[13px] font-medium border border-gray-200/50 rounded-[10px]
+              bg-white text-gray-700 placeholder:text-gray-400/80 placeholder:font-normal
+              focus:outline-none focus:ring-4 focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]/40
+              transition-all
+            "
           />
         </div>
 
@@ -226,7 +231,12 @@ export function DataTableNcageRecords({ data }: DataTableNcageRecordsProps) {
               .getColumn("status_kode")
               ?.setFilterValue(e.target.value || undefined)
           }
-          className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]/10 focus:border-[#8B1E1E] transition-all cursor-pointer"
+          className="
+            px-4 py-2.5 text-[13px] font-medium border border-gray-200/50 rounded-[10px]
+            bg-white text-gray-600 focus:outline-none
+            focus:ring-4 focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]/40
+            transition-all cursor-pointer
+          "
         >
           <option value="">Semua Status</option>
           <option value="Aktif">Aktif</option>
@@ -234,7 +244,7 @@ export function DataTableNcageRecords({ data }: DataTableNcageRecordsProps) {
         </select>
       </div>
 
-      <div className="rounded-xl border border-gray-100 overflow-hidden bg-white shadow-sm">
+      <div className="rounded-[15px] border border-gray-100/40 overflow-hidden bg-white shadow-sm shadow-gray-100/40">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

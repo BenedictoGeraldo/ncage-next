@@ -1,14 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import { adminLogin } from "../action";
 
 const AdminLoginPage = () => {
   const [state, formAction] = useActionState(adminLogin, null);
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+
+  // Load remembered email on mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("admin_remember_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
+  // Save or remove remembered email on form submit
+  const handleFormSubmit = () => {
+    if (rememberMe) {
+      localStorage.setItem("admin_remember_email", email);
+    } else {
+      localStorage.removeItem("admin_remember_email");
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -32,15 +51,15 @@ const AdminLoginPage = () => {
 
         <div className="flex-1 flex items-center justify-center px-10 sm:px-16 lg:px-20 pt-28 pb-16">
           <div className="w-full max-w-[420px]">
-            <h1 className="text-[28px] font-bold text-[#8B1E1E] mb-10 leading-snug">
+            <h1 className="text-[28px] font-semibold text-[#8B1E1E] mb-10 leading-snug text-center tracking-tight">
               Selamat Datang Admin
             </h1>
 
-            <form action={formAction} className="flex flex-col gap-5">
+            <form action={formAction} onSubmit={handleFormSubmit} className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="email"
-                  className="text-[13px] font-semibold text-[#374151]"
+                  className="text-[13px] font-semibold text-[#374151] ml-1"
                 >
                   Email
                 </label>
@@ -48,13 +67,15 @@ const AdminLoginPage = () => {
                   id="email"
                   type="email"
                   name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Masukkan alamat email"
                   required
                   autoComplete="email"
-                  className={`w-full px-4 py-3 border rounded-lg text-[14px] text-[#374151] placeholder:text-gray-400 outline-none transition-all ${
+                  className={`w-full px-5 py-4 border rounded-[15px] text-[15px] text-[#374151] placeholder:text-gray-400 outline-none transition-all ${
                     state?.error
-                      ? "border-red-400 focus:ring-2 focus:ring-red-100 bg-red-50/20"
-                      : "border-[#D1D5DB] focus:border-[#8B1E1E] focus:ring-2 focus:ring-[#8B1E1E]/10"
+                      ? "border-red-400 focus:ring-4 focus:ring-red-400/10 focus:border-red-400 bg-red-50/10"
+                      : "border-gray-200 focus:border-[#8B1E1E] focus:ring-4 focus:ring-[#8B1E1E]/5"
                   }`}
                 />
               </div>
@@ -62,7 +83,7 @@ const AdminLoginPage = () => {
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="password"
-                  className="text-[13px] font-semibold text-[#374151]"
+                  className="text-[13px] font-semibold text-[#374151] ml-1"
                 >
                   Kata Sandi
                 </label>
@@ -76,16 +97,16 @@ const AdminLoginPage = () => {
                     placeholder="Masukkan Kata Sandi"
                     required
                     autoComplete="current-password"
-                    className={`w-full px-4 py-3 pr-11 border rounded-lg text-[14px] text-[#374151] placeholder:text-gray-400 outline-none transition-all ${
+                    className={`w-full px-5 py-4 pr-12 border rounded-[15px] text-[15px] text-[#374151] placeholder:text-gray-400 outline-none transition-all ${
                       state?.error
-                        ? "border-red-400 focus:ring-2 focus:ring-red-100 bg-red-50/20"
-                        : "border-[#D1D5DB] focus:border-[#8B1E1E] focus:ring-2 focus:ring-[#8B1E1E]/10"
+                        ? "border-red-400 focus:ring-4 focus:ring-red-400/10 focus:border-red-400 bg-red-50/10"
+                        : "border-gray-200 focus:border-[#8B1E1E] focus:ring-4 focus:ring-[#8B1E1E]/5"
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B1E1E] transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B1E1E] transition-colors"
                     aria-label="Toggle password visibility"
                   >
                     <i
@@ -106,27 +127,27 @@ const AdminLoginPage = () => {
                 )}
               </div>
 
-              <label className="flex items-center gap-2.5 cursor-pointer group w-fit">
+              <label className="flex items-center gap-2.5 cursor-pointer group w-fit ml-1">
                 <div
                   onClick={() => setRememberMe(!rememberMe)}
-                  className={`w-4 h-4 rounded flex items-center justify-center border transition-all ${
+                  className={`w-4 h-4 rounded-[4px] flex items-center justify-center border transition-all ${
                     rememberMe
                       ? "bg-[#8B1E1E] border-[#8B1E1E]"
-                      : "border-[#D1D5DB] bg-white group-hover:border-[#8B1E1E]"
+                      : "border-gray-300 bg-white group-hover:border-[#8B1E1E]"
                   }`}
                 >
                   {rememberMe && (
                     <i className="ri-check-line text-white text-[10px] leading-none" />
                   )}
                 </div>
-                <span className="text-[13px] text-[#8B1E1E80] font-medium select-none">
+                <span className="text-[13px] text-[#8B1E1E]/75 font-medium select-none">
                   Ingat saya?
                 </span>
               </label>
 
               <button
                 type="submit"
-                className="w-full mt-3 bg-[#5D2E2E] hover:bg-[#4a2424] active:scale-[0.98] text-white py-3.5 rounded-lg font-bold text-[15px] transition-all shadow-lg shadow-[#5D2E2E]/20"
+                className="w-full mt-3 bg-[#5D2E2E] hover:bg-[#4a2424] active:scale-[0.98] text-white py-4 rounded-[15px] font-bold text-[16px] transition-all duration-300 ease-out hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#5D2E2E]/20"
               >
                 Masuk
               </button>

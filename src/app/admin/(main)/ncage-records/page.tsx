@@ -81,13 +81,13 @@ export default async function NcageRecordsPage() {
   const records = await getNcageRecords();
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+    <div className="p-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+      <div>
+        <h1 className="text-[28px] font-semibold text-gray-800 tracking-tight">
           NCAGE Records
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Rekap seluruh kode NCAGE yang telah diterbitkan beserta statusnya.
+        <p className="text-[14px] text-gray-500 mt-2.5 font-normal leading-relaxed">
+          Rekap seluruh kode NCAGE yang telah diterbitkan beserta statusnya secara sistematis.
         </p>
       </div>
 

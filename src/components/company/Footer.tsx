@@ -12,7 +12,7 @@ export default function Footer() {
     return null;
   }
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,

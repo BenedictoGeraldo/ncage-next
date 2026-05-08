@@ -109,7 +109,7 @@ export default function NotificationsPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 pl-4 md:pl-8">
           <div className="space-y-3">
-            <h1 className="text-4xl font-extrabold text-gray-900">
+            <h1 className="text-3xl font-semibold text-gray-800 tracking-tight">
               Pusat Notifikasi
             </h1>
             <p className="text-lg text-gray-500 font-medium leading-relaxed">
@@ -213,7 +213,7 @@ export default function NotificationsPage() {
                   <i className="ri-notification-off-line text-4xl text-gray-300"></i>
                 </div>
                 <div className="space-y-1 px-10">
-                  <h4 className="text-lg font-bold text-gray-900">
+                  <h4 className="text-lg font-semibold text-gray-700">
                     Tidak ada notifikasi
                   </h4>
                   <p className="text-sm text-gray-500 font-medium">

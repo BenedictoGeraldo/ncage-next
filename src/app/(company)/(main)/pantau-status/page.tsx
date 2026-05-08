@@ -81,23 +81,23 @@ export default async function PantauStatusPage() {
   if (!data) {
     return (
       <div className="max-w-4xl mx-auto p-6 md:p-10">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 tracking-tight mb-8">
           Pantau Status Pengajuan
         </h1>
-        <div className="bg-white rounded-[20px] border border-gray-100 p-12 text-center shadow-sm">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="ri-inbox-line text-4xl text-gray-400"></i>
+        <div className="bg-white rounded-3xl border border-gray-100/50 p-12 text-center shadow-xl shadow-gray-200/30 z-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+          <div className="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 transition-all duration-500 hover:scale-110 shadow-inner">
+            <i className="ri-inbox-line text-4xl"></i>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
             Belum Ada Pengajuan
           </h2>
-          <p className="text-gray-500 mb-8 max-w-md mx-auto">
+          <p className="text-gray-500 mb-8 max-w-md mx-auto leading-relaxed">
             Anda belum melakukan pendaftaran NCAGE. Silakan ajukan permohonan
             baru melalui menu Pendaftaran NCAGE.
           </p>
           <Link
             href="/pendaftaran-ncage"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#8a1515] hover:bg-[#6e1010] text-white font-medium rounded-xl transition-colors shadow-md"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#8C1E1E] hover:bg-[#721818] text-white font-semibold rounded-xl transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] shadow-lg shadow-[#8C1E1E]/20"
           >
             Mulai Pendaftaran
           </Link>
@@ -125,137 +125,136 @@ export default async function PantauStatusPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 md:p-10">
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
+      <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 tracking-tight mb-8">
         Pantau Status Pengajuan
       </h1>
 
-      <div className="bg-white rounded-[20px] border border-gray-100 p-8 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
-        <div className="flex flex-col gap-6 md:gap-8">
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                ID Permohonan
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <span className="text-gray-900 font-semibold text-[15px]">
-                {data.id}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                Tanggal Pengajuan
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <span className="text-gray-900 font-semibold text-[15px]">
-                {data.created_at
-                  ? new Date(data.created_at).toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })
-                  : "-"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                Jenis Permohonan
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <span className="text-gray-900 font-semibold text-[15px]">
-                {identity?.application_type ?? "-"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                Jenis Permohonan NCAGE
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <span className="text-gray-900 font-semibold text-[15px]">
-                {identity?.ncage_request_type ?? "-"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                Tujuan Penerbitan NCAGE
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <span className="text-gray-900 font-semibold text-[15px]">
-                {identity?.purpose ?? "-"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                Tipe Entitas
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <span className="text-gray-900 font-semibold text-[15px]">
-                {identity?.entity_type ?? "-"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center">
-              <span className="text-gray-500 font-medium text-[15px]">
-                Status Saat Ini
-              </span>
-              <span className="hidden md:block text-gray-600">:</span>
-              <div className="flex items-center">
-                <span
-                  className={`inline-flex items-center px-4 py-2 rounded-xl text-[13px] font-bold tracking-wide ${cfg.bgClass} ${cfg.textClass}`}
-                >
-                  {cfg.label}
-                </span>
-              </div>
-            </div>
-
-            {statusId === 3 && (
-              <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start mt-2">
-                <span className="text-gray-500 font-medium text-[15px] pt-3">
-                  Catatan Revisi
-                </span>
-                <span className="hidden md:block text-gray-600 pt-3">:</span>
-                <div className="flex flex-col items-start gap-4">
-                  {data.revision_notes && (
-                    <div className="w-full p-4 bg-orange-50 border border-orange-100 rounded-xl text-orange-900 text-[14px] leading-relaxed">
-                      <i className="ri-error-warning-line mr-2 text-orange-500"></i>
-                      {data.revision_notes}
-                    </div>
-                  )}
-                  <Link
-                    href="/pendaftaran-ncage"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white text-[13px] font-semibold rounded-xl hover:bg-orange-700 transition-colors shadow-sm shadow-orange-600/20 active:scale-95"
-                  >
-                    <i className="ri-edit-2-line"></i>
-                    Perbaiki Permohonan
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {statusId === 4 && data.domestic_certificate_path && (
-              <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start mt-2">
-                <span className="text-gray-500 font-medium text-[15px] pt-3">
-                  Dokumen Sertifikat
-                </span>
-                <span className="hidden md:block text-gray-600 pt-3">:</span>
-                <div className="flex flex-col items-start gap-4">
-                  <a
-                    href={domesticCertificateUrl || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-100 text-emerald-700 text-[13px] font-bold rounded-xl transition-colors shadow-sm shadow-emerald-600/20 active:scale-95"
-                  >
-                    <i className="ri-download-2-line"></i>
-                    Unduh Sertifikat (DOCX)
-                  </a>
-                </div>
-              </div>
-            )}
+      <div className="bg-white rounded-3xl border border-gray-100/50 p-8 md:p-10 shadow-xl shadow-gray-200/30 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+        <div className="flex flex-col divide-y divide-gray-100/60">
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5 first:pt-0">
+            <span className="text-gray-500 font-medium text-[15px]">
+              ID Permohonan
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <span className="text-gray-800 font-semibold text-[15px]">
+              {data.id}
+            </span>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5">
+            <span className="text-gray-500 font-medium text-[15px]">
+              Tanggal Pengajuan
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <span className="text-gray-800 font-semibold text-[15px]">
+              {data.created_at
+                ? new Date(data.created_at).toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                : "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5">
+            <span className="text-gray-500 font-medium text-[15px]">
+              Jenis Permohonan
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <span className="text-gray-800 font-semibold text-[15px]">
+              {identity?.application_type ?? "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5">
+            <span className="text-gray-500 font-medium text-[15px]">
+              Jenis Permohonan NCAGE
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <span className="text-gray-800 font-semibold text-[15px]">
+              {identity?.ncage_request_type ?? "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5">
+            <span className="text-gray-500 font-medium text-[15px]">
+              Tujuan Penerbitan NCAGE
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <span className="text-gray-800 font-semibold text-[15px]">
+              {identity?.purpose ?? "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5">
+            <span className="text-gray-500 font-medium text-[15px]">
+              Tipe Entitas
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <span className="text-gray-800 font-semibold text-[15px]">
+              {identity?.entity_type ?? "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start md:items-center py-5 last:pb-0">
+            <span className="text-gray-500 font-medium text-[15px]">
+              Status Saat Ini
+            </span>
+            <span className="hidden md:block text-gray-300">:</span>
+            <div className="flex items-center">
+              <span
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold tracking-wide shadow-sm ${cfg.bgClass} ${cfg.textClass}`}
+              >
+                <i className={`${cfg.icon} text-base`}></i>
+                {cfg.label}
+              </span>
+            </div>
+          </div>
+
+          {statusId === 3 && (
+            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start pt-5 pb-2 last:pb-0">
+              <span className="text-gray-500 font-medium text-[15px] pt-1">
+                Catatan Revisi
+              </span>
+              <span className="hidden md:block text-gray-300 pt-1">:</span>
+              <div className="flex flex-col items-start gap-4">
+                {data.revision_notes && (
+                  <div className="w-full p-4 bg-orange-50 border border-orange-100 rounded-xl text-orange-900 text-[14px] leading-relaxed">
+                    <i className="ri-error-warning-line mr-2 text-orange-500 text-base"></i>
+                    {data.revision_notes}
+                  </div>
+                )}
+                <Link
+                  href="/pendaftaran-ncage"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white text-[13px] font-semibold rounded-xl hover:bg-orange-700 transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] shadow-sm shadow-orange-600/20"
+                >
+                  <i className="ri-edit-2-line"></i>
+                  Perbaiki Permohonan
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {statusId === 4 && data.domestic_certificate_path && (
+            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start pt-5 pb-2 last:pb-0">
+              <span className="text-gray-500 font-medium text-[15px] pt-1">
+                Dokumen Sertifikat
+              </span>
+              <span className="hidden md:block text-gray-300 pt-1">:</span>
+              <div className="flex flex-col items-start gap-4">
+                <a
+                  href={domesticCertificateUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-100 text-emerald-700 text-[13px] font-bold rounded-xl hover:bg-emerald-200 transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] shadow-sm shadow-emerald-600/20"
+                >
+                  <i className="ri-download-2-line"></i>
+                  Unduh Sertifikat (DOCX)
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
