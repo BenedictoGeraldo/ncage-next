@@ -67,12 +67,27 @@ export function DataTableNcageRecords({ data }: DataTableNcageRecordsProps) {
 
           <button
             onClick={() => {
-              alert(`Download sertifikat ${row.original.kode_ncage}`);
+              if (row.original.sertifikat_url) {
+                window.open(
+                  row.original.sertifikat_url,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              } else {
+                alert(
+                  `Sertifikat untuk ${row.original.kode_ncage} belum tersedia.`,
+                );
+              }
             }}
             title="Download Sertifikat"
-            className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all shadow-sm shadow-emerald-500/30"
+            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow-sm ${
+              row.original.sertifikat_url
+                ? "bg-emerald-500 hover:bg-emerald-600 active:scale-95 shadow-emerald-500/30 text-white"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
+            disabled={!row.original.sertifikat_url}
           >
-            <i className="ri-download-2-line text-white text-[15px]" />
+            <i className="ri-download-2-line text-[15px]" />
           </button>
         </div>
       ),
@@ -177,7 +192,6 @@ export function DataTableNcageRecords({ data }: DataTableNcageRecordsProps) {
     },
   ];
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

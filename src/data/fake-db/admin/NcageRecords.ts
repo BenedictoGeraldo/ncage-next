@@ -10,6 +10,7 @@ export interface NcageRecord {
   tanggal_terbit: string;
   // Referensi ke permohonan asal
   permohonan_id: string;
+  sertifikat_url?: string | null;
 }
 
 // ─── Fake Data ────────────────────────────────────────────────────────────────

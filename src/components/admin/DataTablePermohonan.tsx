@@ -21,36 +21,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/src/components/ui/table";
-import type {
-  Permohonan,
-  StatusPermohonan,
-} from "@/src/data/fake-db/admin/DataPermohonan";
+import type { PermohonanRow } from "@/src/types/permohonan";
 
-const statusConfig: Record<
-  StatusPermohonan,
-  { label: string; className: string }
-> = {
-  "Menunggu Verifikasi": {
-    label: "Menunggu Verifikasi",
+const statusConfig: Record<number, { label: string; className: string }> = {
+  1: {
+    label: "Permohonan Dikirim",
     className: "bg-gray-100 text-gray-600",
   },
-  "Sedang Diverifikasi": {
-    label: "Sedang Diverifikasi",
+  2: {
+    label: "Verifikasi Berkas & Data",
     className: "bg-amber-100 text-amber-700",
   },
-  Disetujui: {
-    label: "Disetujui",
-    className: "bg-emerald-100 text-emerald-700",
-  },
-  Revisi: {
-    label: "Revisi",
+  3: {
+    label: "Butuh Perbaikan",
     className: "bg-orange-100 text-orange-700",
   },
-  Ditolak: {
-    label: "Ditolak",
+  4: {
+    label: "Sertifikat Diterbitkan",
+    className: "bg-emerald-100 text-emerald-700",
+  },
+  5: {
+    label: "Permohonan Ditolak",
     className: "bg-red-100 text-red-600",
   },
 };
+
+const STATUS_OPTIONS = Object.entries(statusConfig).map(([id, cfg]) => ({
+  id: Number(id),
+  label: cfg.label,
+}));
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -61,7 +60,7 @@ function formatDate(dateStr: string) {
 }
 
 interface DataTablePermohonanProps {
-  data: Permohonan[];
+  data: PermohonanRow[];
 }
 
 export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
@@ -72,7 +71,7 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
 
-  const columns: ColumnDef<Permohonan>[] = [
+  const columns: ColumnDef<PermohonanRow>[] = [
     {
       id: "aksi",
       header: "Aksi",
@@ -115,7 +114,9 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
       ),
       cell: ({ row }) => (
         <span className="font-medium text-gray-800">
-          {row.getValue("nama_pemohon")}
+          {row.getValue("nama_pemohon") ?? (
+            <span className="text-gray-400 italic">—</span>
+          )}
         </span>
       ),
     },
@@ -140,16 +141,23 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
         </button>
       ),
       cell: ({ row }) => (
-        <span className="text-gray-600">{row.getValue("nama_perusahaan")}</span>
+        <span className="text-gray-600">
+          {row.getValue("nama_perusahaan") ?? (
+            <span className="text-gray-400 italic">—</span>
+          )}
+        </span>
       ),
     },
 
     {
-      accessorKey: "status",
+      accessorKey: "status_id",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.getValue("status") as StatusPermohonan;
-        const config = statusConfig[status];
+        const statusId = row.getValue("status_id") as number;
+        const config = statusConfig[statusId] ?? {
+          label: "Tidak Diketahui",
+          className: "bg-gray-100 text-gray-500",
+        };
         return (
           <span
             className={`
@@ -162,10 +170,14 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
           </span>
         );
       },
+      filterFn: (row, _columnId, filterValue) => {
+        if (!filterValue) return true;
+        return row.original.status_id === Number(filterValue);
+      },
     },
 
     {
-      accessorKey: "tanggal_pengajuan",
+      accessorKey: "created_at",
       header: ({ column }) => (
         <button
           className="flex items-center gap-1.5 font-semibold hover:text-[#8B1E1E] transition-colors"
@@ -185,7 +197,7 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
       ),
       cell: ({ row }) => (
         <span className="text-gray-500 text-[13px]">
-          {formatDate(row.getValue("tanggal_pengajuan"))}
+          {formatDate(row.getValue("created_at"))}
         </span>
       ),
     },
@@ -227,7 +239,7 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
         <select
           onChange={(e) =>
             table
-              .getColumn("status")
+              .getColumn("status_id")
               ?.setFilterValue(e.target.value || undefined)
           }
           className="
@@ -238,9 +250,9 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
           "
         >
           <option value="">Semua Status</option>
-          {Object.keys(statusConfig).map((s) => (
-            <option key={s} value={s}>
-              {s}
+          {STATUS_OPTIONS.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.label}
             </option>
           ))}
         </select>
@@ -310,9 +322,11 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
         <span>
           Menampilkan{" "}
           <strong className="text-gray-700">
-            {table.getState().pagination.pageIndex *
-              table.getState().pagination.pageSize +
-              1}
+            {table.getFilteredRowModel().rows.length === 0
+              ? 0
+              : table.getState().pagination.pageIndex *
+                  table.getState().pagination.pageSize +
+                1}
           </strong>{" "}
           –{" "}
           <strong className="text-gray-700">
@@ -346,7 +360,8 @@ export function DataTablePermohonan({ data }: DataTablePermohonanProps) {
           </button>
 
           <span className="px-3 py-1 rounded-lg bg-[#8B1E1E] text-white text-[12px] font-bold">
-            {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+            {table.getState().pagination.pageIndex + 1} /{" "}
+            {table.getPageCount() || 1}
           </span>
 
           <button

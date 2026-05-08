@@ -8,7 +8,7 @@ const fileSchema = (isRequired: boolean = true, isImage: boolean = false) => {
 
   if (isRequired) {
     schema = schema.refine(
-      (file) => typeof window !== "undefined" && file instanceof File,
+      (file) => (typeof window !== "undefined" && file instanceof File) || typeof file === "string",
       "File wajib diunggah.",
     );
   } else {
@@ -18,12 +18,14 @@ const fileSchema = (isRequired: boolean = true, isImage: boolean = false) => {
   return schema
     .refine((file: unknown) => {
       if (!file) return !isRequired;
+      if (typeof file === "string") return true; // file lama
       if (!(file instanceof File)) return false;
       return file.size <= MAX_FILE_SIZE;
     }, "Ukuran file maksimal 5MB.")
     .refine(
       (file: unknown) => {
         if (!file) return !isRequired;
+        if (typeof file === "string") return true; // file lama
         if (!(file instanceof File)) return false;
         if (isImage) {
           return file.type.startsWith("image/");

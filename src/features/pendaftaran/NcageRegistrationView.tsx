@@ -5,6 +5,7 @@ import Stepper, { StepItem } from "@/src/components/ui/Stepper";
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/utils/supabase/client";
+import { createAdminClient } from "@/src/utils/supabase/admin";
 
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +23,22 @@ import Step2Form from "./components/step2-sections/Step2Form";
 import Step3Review from "./components/Step3Review";
 import SubmissionModal from "@/src/components/company/SubmissionModal";
 
+const STATUS_PERMOHONAN_DIKIRIM = 1;
+
+const FILE_FIELDS = [
+  "surat_permohonan",
+  "surat_pernyataan",
+  "foto_kantor",
+  "sk_domisili",
+  "akta_notaris",
+  "sk_kemenkumham",
+  "siup_nib",
+  "company_profile",
+  "npwp_perusahaan",
+  "surat_kuasa",
+  "daftar_isian_sam",
+] as const;
+
 const NCAGE_STEPS: StepItem[] = [
   { id: 1, label: "Unggah Berkas", icon: "ri-file-upload-line" },
   { id: 2, label: "Isi Formulir", icon: "ri-draft-line" },
@@ -37,13 +54,14 @@ export default function NcageRegistrationView() {
   >("closed");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [existingAppId, setExistingAppId] = useState<string | null>(null);
 
   const methods = useForm<NcageRegistrationFormValues>({
     resolver: zodResolver(ncageRegistrationSchema),
     mode: "onChange",
   });
 
-  const { trigger, handleSubmit } = methods;
+  const { trigger, handleSubmit, reset } = methods;
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -55,15 +73,96 @@ export default function NcageRegistrationView() {
         const {
           data: { user },
         } = await supabase.auth.getUser();
+
         if (user) {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("ncage_applications")
-            .select("id")
+            .select(
+              `
+              id,
+              status_id,
+              documents,
+              application_identities (*),
+              application_contacts (*),
+              company_details (*),
+              other_informations (*)
+            `,
+            )
             .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
             .maybeSingle();
 
           if (data) {
-            setModalState("already_registered");
+            if (data.status_id !== 3) {
+              setModalState("already_registered");
+              return;
+            }
+
+            setExistingAppId(data.id);
+
+            const ident = Array.isArray(data.application_identities)
+              ? data.application_identities[0]
+              : data.application_identities;
+            const contact = Array.isArray(data.application_contacts)
+              ? data.application_contacts[0]
+              : data.application_contacts;
+            const company = Array.isArray(data.company_details)
+              ? data.company_details[0]
+              : data.company_details;
+            const other = Array.isArray(data.other_informations)
+              ? data.other_informations[0]
+              : data.other_informations;
+            const docs = (data.documents as Record<string, string>) || {};
+
+            reset({
+              ...docs,
+
+              tanggal_pengajuan: ident?.submission_date || "",
+              jenis_permohonan: ident?.application_type || "",
+              jenis_ncage: ident?.ncage_request_type || "",
+              tujuan_penerbitan: ident?.purpose || "",
+              tipe_entitas: ident?.entity_type || "",
+              status_kepemilikan: ident?.building_ownership_status || "",
+              is_ahu_registered: ident?.is_ahu_registered ? "Ya" : "Tidak",
+              koordinat_kantor: ident?.office_coordinate || "",
+              nib: ident?.nib || "",
+              npwp: ident?.npwp || "",
+              bidang_usaha: ident?.business_field || "",
+
+              nama_pemohon: contact?.name || "",
+              nomor_identitas: contact?.identity_number || "",
+              alamat_pemohon: contact?.address || "",
+              no_hp_pemohon: contact?.phone_number || "",
+              email_pemohon: contact?.email || "",
+              jabatan_pemohon: contact?.position || "",
+
+              nama_badan_usaha: company?.name || "",
+              provinsi: company?.province || "",
+              kota: company?.city || "",
+              alamat_kantor: company?.street || "",
+              kode_pos: company?.postal_code || "",
+              po_box: company?.po_box || "",
+              no_telepon_kantor: company?.phone || "",
+              no_fax_kantor: company?.fax || "",
+              email_kantor: company?.email || "",
+              website_kantor: company?.website || "",
+              perusahaan_afiliasi: company?.affiliate || "",
+
+              produk_dihasilkan: other?.products || "",
+              kemampuan_produksi: other?.production_capacity || "",
+              jumlah_karyawan: other?.number_of_employees || "",
+              kantor_cabang: other?.branch_office_name || "",
+              jalan_cabang: other?.branch_office_street || "",
+              kota_cabang: other?.branch_office_city || "",
+              kode_pos_cabang: other?.branch_office_postal_code || "",
+              perusahaan_afiliasi_info: other?.affiliate_company || "",
+              jalan_afiliasi: other?.affiliate_company_street || "",
+              kota_afiliasi: other?.affiliate_company_city || "",
+              kode_pos_afiliasi: other?.affiliate_company_postal_code || "",
+
+              is_agreed: false,
+            });
           }
         }
       } catch (error) {
@@ -73,7 +172,7 @@ export default function NcageRegistrationView() {
       }
     };
     checkRegistration();
-  }, [supabase]);
+  }, [supabase, reset]);
 
   const getVisualStep = (step: number) => {
     if (step === 1) return 1;
@@ -189,28 +288,11 @@ export default function NcageRegistrationView() {
       }
 
       const data = methods.getValues();
-      const formData = data as unknown as Record<
-        string,
-        string | File | undefined
-      >;
-      const fileFields = [
-        "surat_permohonan",
-        "surat_pernyataan",
-        "foto_kantor",
-        "sk_domisili",
-        "akta_notaris",
-        "sk_kemenkumham",
-        "siup_nib",
-        "company_profile",
-        "npwp_perusahaan",
-        "surat_kuasa",
-        "daftar_isian_sam",
-      ];
 
       const uploadedPaths: Record<string, string> = {};
 
-      for (const field of fileFields) {
-        const file = formData[field];
+      for (const field of FILE_FIELDS) {
+        const file = data[field];
         if (file && file instanceof File) {
           const fileExt = file.name.split(".").pop();
           const fileName = `${field}_${Date.now()}.${fileExt}`;
@@ -223,92 +305,197 @@ export default function NcageRegistrationView() {
 
           if (uploadError) {
             console.error(`Gagal upload ${field}:`, uploadError);
-            throw new Error(`Gagal mengunggah dokumen ${field}`);
+            throw new Error(`Gagal mengunggah dokumen: ${field}`);
           }
 
           uploadedPaths[field] = uploadData.path;
+        } else if (typeof file === "string") {
+          uploadedPaths[field] = file;
         }
       }
 
-      const { data: appData, error: appError } = await supabase
-        .from("ncage_applications")
-        .insert([
-          {
-            user_id: user.id,
+      let appId = existingAppId;
+
+      if (existingAppId) {
+        const { error: appError } = await supabase
+          .from("ncage_applications")
+          .update({
+            status_id: STATUS_PERMOHONAN_DIKIRIM,
             documents: uploadedPaths,
-          },
-        ])
-        .select("id")
-        .single();
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingAppId);
+        if (appError)
+          throw new Error(`[ncage_applications] ${appError.message}`);
 
-      if (appError) throw new Error(`[ncage_applications] ${appError.message}`);
+        try {
+          const adminSupabase = createAdminClient();
+          await adminSupabase.from("notifications").insert({
+            user_id: user.id,
+            type: "info",
+            title: "Perbaikan Permohonan Berhasil Dikirim",
+            description:
+              "Permohonan NCAGE Anda yang telah diperbaiki berhasil dikirim ulang dan sedang dalam proses verifikasi.",
+            related_application_id: existingAppId,
+          });
+        } catch (_) {}
 
-      const appId = appData.id;
-
-      const { error: identityError } = await supabase
-        .from("application_identities")
-        .insert([
-          {
-            ncage_application_id: appId,
+        const { error: identityError } = await supabase
+          .from("application_identities")
+          .update({
             submission_date: data.tanggal_pengajuan || null,
             application_type: data.jenis_permohonan,
-            ncage_request_type: formData.jenis_ncage as string,
+            ncage_request_type: data.jenis_ncage,
             purpose: data.tujuan_penerbitan,
             entity_type: data.tipe_entitas,
-            building_ownership_status: formData.status_kepemilikan as string,
+            building_ownership_status: data.status_kepemilikan,
             is_ahu_registered:
-              formData.is_ahu_registered === "Ya" ||
-              formData.is_ahu_registered === "true",
+              data.is_ahu_registered === "Ya" ||
+              data.is_ahu_registered === "true",
             office_coordinate: data.koordinat_kantor,
-            nib: formData.nib as string,
-            npwp: formData.npwp as string,
+            nib: data.nib,
+            npwp: data.npwp,
             business_field: data.bidang_usaha,
-          },
-        ]);
-      if (identityError)
-        throw new Error(`[application_identities] ${identityError.message}`);
+          })
+          .eq("ncage_application_id", existingAppId);
+        if (identityError)
+          throw new Error(`[application_identities] ${identityError.message}`);
 
-      const { error: contactError } = await supabase
-        .from("application_contacts")
-        .insert([
-          {
-            ncage_application_id: appId,
+        const { error: contactError } = await supabase
+          .from("application_contacts")
+          .update({
             name: data.nama_pemohon,
-            identity_number: formData.nomor_identitas as string,
+            identity_number: data.nomor_identitas,
             address: data.alamat_pemohon,
-            phone_number: formData.no_hp_pemohon as string,
+            phone_number: data.no_hp_pemohon,
             email: data.email_pemohon,
             position: data.jabatan_pemohon,
-          },
-        ]);
-      if (contactError)
-        throw new Error(`[application_contacts] ${contactError.message}`);
+          })
+          .eq("ncage_application_id", existingAppId);
+        if (contactError)
+          throw new Error(`[application_contacts] ${contactError.message}`);
 
-      const { error: companyError } = await supabase
-        .from("company_details")
-        .insert([
-          {
-            ncage_application_id: appId,
+        const { error: companyError } = await supabase
+          .from("company_details")
+          .update({
             name: data.nama_badan_usaha,
-            province: formData.provinsi as string,
-            city: formData.kota as string,
+            province: data.provinsi,
+            city: data.kota,
             street: data.alamat_kantor,
-            postal_code: formData.kode_pos as string,
-            po_box: formData.po_box as string,
+            postal_code: data.kode_pos,
+            po_box: data.po_box,
             phone: data.no_telepon_kantor,
             fax: data.no_fax_kantor,
             email: data.email_kantor,
             website: data.website_kantor,
             affiliate: data.perusahaan_afiliasi,
-          },
-        ]);
-      if (companyError)
-        throw new Error(`[company_details] ${companyError.message}`);
+          })
+          .eq("ncage_application_id", existingAppId);
+        if (companyError)
+          throw new Error(`[company_details] ${companyError.message}`);
 
-      const { error: otherError } = await supabase
-        .from("other_informations")
-        .insert([
-          {
+        const { error: otherError } = await supabase
+          .from("other_informations")
+          .update({
+            products: data.produk_dihasilkan,
+            production_capacity: data.kemampuan_produksi,
+            number_of_employees: data.jumlah_karyawan,
+            branch_office_name: data.kantor_cabang,
+            branch_office_street: data.jalan_cabang,
+            branch_office_city: data.kota_cabang,
+            branch_office_postal_code: data.kode_pos_cabang,
+            affiliate_company: data.perusahaan_afiliasi_info,
+            affiliate_company_street: data.jalan_afiliasi,
+            affiliate_company_city: data.kota_afiliasi,
+            affiliate_company_postal_code: data.kode_pos_afiliasi,
+          })
+          .eq("ncage_application_id", existingAppId);
+        if (otherError)
+          throw new Error(`[other_informations] ${otherError.message}`);
+      } else {
+        const { data: appData, error: appError } = await supabase
+          .from("ncage_applications")
+          .insert({
+            user_id: user.id,
+            status_id: STATUS_PERMOHONAN_DIKIRIM,
+            documents: uploadedPaths,
+          })
+          .select("id")
+          .single();
+
+        if (appError)
+          throw new Error(`[ncage_applications] ${appError.message}`);
+        appId = appData.id;
+
+        try {
+          const adminSupabase = createAdminClient();
+          await adminSupabase.from("notifications").insert({
+            user_id: user.id,
+            type: "success",
+            title: "Pendaftaran NCAGE Berhasil Dikirim",
+            description:
+              "Permohonan NCAGE Anda telah berhasil dikirim dan sedang dalam proses verifikasi oleh tim Puskod Kemhan.",
+            related_application_id: appData.id,
+          });
+        } catch (_) {}
+
+        const { error: identityError } = await supabase
+          .from("application_identities")
+          .insert({
+            ncage_application_id: appId,
+            submission_date: data.tanggal_pengajuan || null,
+            application_type: data.jenis_permohonan,
+            ncage_request_type: data.jenis_ncage,
+            purpose: data.tujuan_penerbitan,
+            entity_type: data.tipe_entitas,
+            building_ownership_status: data.status_kepemilikan,
+            is_ahu_registered:
+              data.is_ahu_registered === "Ya" ||
+              data.is_ahu_registered === "true",
+            office_coordinate: data.koordinat_kantor,
+            nib: data.nib,
+            npwp: data.npwp,
+            business_field: data.bidang_usaha,
+          });
+        if (identityError)
+          throw new Error(`[application_identities] ${identityError.message}`);
+
+        const { error: contactError } = await supabase
+          .from("application_contacts")
+          .insert({
+            ncage_application_id: appId,
+            name: data.nama_pemohon,
+            identity_number: data.nomor_identitas,
+            address: data.alamat_pemohon,
+            phone_number: data.no_hp_pemohon,
+            email: data.email_pemohon,
+            position: data.jabatan_pemohon,
+          });
+        if (contactError)
+          throw new Error(`[application_contacts] ${contactError.message}`);
+
+        const { error: companyError } = await supabase
+          .from("company_details")
+          .insert({
+            ncage_application_id: appId,
+            name: data.nama_badan_usaha,
+            province: data.provinsi,
+            city: data.kota,
+            street: data.alamat_kantor,
+            postal_code: data.kode_pos,
+            po_box: data.po_box,
+            phone: data.no_telepon_kantor,
+            fax: data.no_fax_kantor,
+            email: data.email_kantor,
+            website: data.website_kantor,
+            affiliate: data.perusahaan_afiliasi,
+          });
+        if (companyError)
+          throw new Error(`[company_details] ${companyError.message}`);
+
+        const { error: otherError } = await supabase
+          .from("other_informations")
+          .insert({
             ncage_application_id: appId,
             products: data.produk_dihasilkan,
             production_capacity: data.kemampuan_produksi,
@@ -321,14 +508,14 @@ export default function NcageRegistrationView() {
             affiliate_company_street: data.jalan_afiliasi,
             affiliate_company_city: data.kota_afiliasi,
             affiliate_company_postal_code: data.kode_pos_afiliasi,
-          },
-        ]);
-      if (otherError)
-        throw new Error(`[other_informations] ${otherError.message}`);
+          });
+        if (otherError)
+          throw new Error(`[other_informations] ${otherError.message}`);
+      }
 
       setModalState("success");
     } catch (error) {
-      console.error("Terjadi kesalahan:", error);
+      console.error("Terjadi kesalahan saat submit:", error);
       alert(
         error instanceof Error
           ? error.message
@@ -352,7 +539,6 @@ export default function NcageRegistrationView() {
 
   return (
     <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-2xl border border-gray-100 overflow-hidden mb-12 relative">
-      {/* Dialog Already Registered */}
       {modalState === "already_registered" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" />
@@ -383,10 +569,8 @@ export default function NcageRegistrationView() {
       <div className="p-6 md:p-10 bg-white">
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* AREA RENDER KOMPONEN */}
             <div className={currentStep === 1 ? "block" : "hidden"}>
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* Unified Box Header */}
                 <div className="bg-gray-50 px-6 pt-10 pb-8 rounded-t-2xl border border-gray-200 border-b-0 flex flex-col items-center text-center">
                   <h3 className="text-xl font-bold text-gray-900">
                     Unggah Dokumen Persyaratan
@@ -397,7 +581,6 @@ export default function NcageRegistrationView() {
                   </p>
                 </div>
 
-                {/* Box Content Area */}
                 <div className="border border-gray-200 rounded-b-2xl p-8 md:p-10 bg-white shadow-sm">
                   <Step1Upload />
                 </div>
@@ -406,7 +589,6 @@ export default function NcageRegistrationView() {
 
             {currentStep >= 2 && currentStep <= 5 && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* Unified Box Header */}
                 <div className="bg-gray-50 px-6 pt-10 pb-8 rounded-t-2xl border border-gray-200 border-b-0 flex flex-col items-center text-center">
                   <span className="text-sm font-medium text-gray-500 mb-4">
                     Lengkapi Formulir Permintaan
@@ -419,7 +601,6 @@ export default function NcageRegistrationView() {
                   </h3>
                 </div>
 
-                {/* Box Content Area */}
                 <div className="border border-gray-200 rounded-b-2xl p-8 md:p-10 bg-white shadow-sm">
                   <div className={currentStep === 2 ? "block" : "hidden"}>
                     <SectionAIdentitas />
@@ -440,7 +621,6 @@ export default function NcageRegistrationView() {
               <Step3Review />
             </div>
 
-            {/* TOMBOL NAVIGASI BAWAH */}
             <div className="mt-10 flex justify-between items-center">
               <button
                 type="button"
@@ -461,7 +641,7 @@ export default function NcageRegistrationView() {
               ) : (
                 <button
                   type="button"
-                  onClick={handleNext} // Validasi trigger jalan di sini
+                  onClick={handleNext}
                   className="px-8 py-2.5 bg-[#8a1515] hover:bg-[#6e1010] text-white font-semibold rounded-lg shadow-md transition-colors"
                 >
                   Lanjutkan
