@@ -121,13 +121,13 @@ function StatRadialCard({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
+    <div className="bg-white rounded-2xl border border-gray-100/40 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md hover:scale-[1.01] transition-all duration-300 ease-out">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
             {label}
           </p>
-          <p className="text-4xl font-extrabold text-gray-900 leading-none">
+          <p className="text-3xl font-bold text-gray-800 leading-none">
             <AnimatedCounter target={value} />
           </p>
         </div>
@@ -138,8 +138,8 @@ function StatRadialCard({
         </div>
       </div>
 
-      <p className="text-[11px] text-gray-400 font-semibold mt-5">
-        <span className="font-extrabold" style={{ color }}>
+      <p className="text-[11px] text-gray-400 font-medium mt-6">
+        <span className="font-semibold" style={{ color }}>
           {pct}%
         </span>{" "}
         dari total permohonan
@@ -159,7 +159,7 @@ function IndonesiaMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<GeoTooltip | null>(null);
-  const [geoData, setGeoData] = useState<GeoJSON.FeatureCollection | null>(
+  const [geoData, setGeoData] = useState<any | null>(
     null,
   );
 
@@ -232,7 +232,7 @@ function IndonesiaSVGMap({
   containerRef,
   hoveredName,
 }: {
-  geoData: GeoJSON.FeatureCollection;
+  geoData: any;
   provinceCountMap: Record<string, number>;
   getFill: (n: number) => string;
   onHover: (name: string, count: number, x: number, y: number) => void;
@@ -267,7 +267,7 @@ function IndonesiaSVGMap({
       .join(" ");
   }
 
-  function featureToPath(feature: GeoJSON.Feature): string {
+  function featureToPath(feature: any): string {
     const geom = feature.geometry;
     if (geom.type === "Polygon")
       return coordsToPath(geom.coordinates as number[][][]);
@@ -283,7 +283,7 @@ function IndonesiaSVGMap({
       viewBox={`0 0 ${W} ${H}`}
       style={{ width: "100%", height: "100%", background: "transparent" }}
     >
-      {geoData.features.map((feature, i) => {
+      {geoData.features.map((feature: any, i: number) => {
         const rawName: string =
           (feature.properties as Record<string, string>)?.state ||
           (feature.properties as Record<string, string>)?.name ||
@@ -378,13 +378,13 @@ export default function DashboardClient({ data }: Props) {
   };
 
   return (
-    <div className="p-8 pb-20 space-y-8">
+    <div className="p-8 pb-20 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 className="text-[28px] font-semibold text-gray-800 tracking-tight">
           Dashboard Admin
         </h1>
-        <p className="text-sm text-gray-500 mt-1 font-medium">
-          Selamat datang!
+        <p className="text-[14px] text-gray-500 mt-2 font-normal leading-relaxed">
+          Selamat datang kembali! Kelola data permohonan dan pendaftaran NCAGE secara real-time.
         </p>
       </div>
 
@@ -419,66 +419,71 @@ export default function DashboardClient({ data }: Props) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-[14px] font-bold text-gray-800 mb-0.5">
-            Status Permohonan
-          </h2>
-          <p className="text-[11px] text-gray-400 mb-4">
-            Distribusi berdasarkan status
-          </p>
-          <ChartContainer
-            config={pieConfig}
-            className="mx-auto aspect-square max-h-[270px]"
-          >
-            <PieChart>
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    hideLabel
-                    formatter={(value, name) => (
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="font-semibold text-gray-700">
-                          {name}
-                        </span>
-                        <span className="font-extrabold text-[#8B1E1E] ml-auto">
-                          {value}
-                        </span>
-                      </div>
-                    )}
-                  />
-                }
-              />
-              <Pie
-                data={data.statusDistribution}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={3}
-                strokeWidth={0}
-                animationBegin={100}
-                animationDuration={1200}
-              >
-                {data.statusDistribution.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Pie>
-              <ChartLegend
-                content={
-                  <ChartLegendContent
-                    nameKey="name"
-                    className="flex-wrap gap-x-4 gap-y-1.5 text-[11px]"
-                  />
-                }
-              />
-            </PieChart>
-          </ChartContainer>
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100/40 shadow-sm p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-[14px] font-bold text-gray-800 mb-0.5">
+              Status Permohonan
+            </h2>
+            <p className="text-[11px] text-gray-400 mb-4">
+              Distribusi berdasarkan status
+            </p>
+            <ChartContainer
+              config={pieConfig}
+              className="mx-auto aspect-square max-h-[250px]"
+            >
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      hideLabel
+                      formatter={(value, name) => (
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="font-semibold text-gray-700">
+                            {name}
+                          </span>
+                          <span className="font-extrabold text-[#8B1E1E] ml-auto">
+                            {value}
+                          </span>
+                        </div>
+                      )}
+                    />
+                  }
+                />
+                <Pie
+                  data={data.statusDistribution}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={95}
+                  paddingAngle={3}
+                  strokeWidth={0}
+                  animationBegin={100}
+                  animationDuration={1200}
+                >
+                  {data.statusDistribution.map((entry, i) => (
+                    <Cell key={i} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-5 border-t border-gray-100/40 pt-4">
+            {data.statusDistribution.map((entry, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                <span className="text-[11px] font-medium text-gray-500 leading-tight">
+                  {entry.name}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100/40 shadow-sm p-6">
           <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
             <div>
               <h2 className="text-[14px] font-bold text-gray-800">
@@ -518,10 +523,10 @@ export default function DashboardClient({ data }: Props) {
               )}
             </div>
           </div>
-          <ChartContainer config={areaConfig} className="h-[240px] w-full">
+          <ChartContainer config={areaConfig} className="h-[240px] w-full mt-8">
             <AreaChart
               data={data.registrationTrend}
-              margin={{ top: 10, right: 8, left: -20, bottom: 0 }}
+              margin={{ top: 20, right: 8, left: -20, bottom: 5 }}
             >
               <defs>
                 <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
@@ -563,7 +568,7 @@ export default function DashboardClient({ data }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-gray-100/40 shadow-sm p-6">
         <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
           <div>
             <h2 className="text-[14px] font-bold text-gray-800">

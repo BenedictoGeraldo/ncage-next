@@ -4,6 +4,7 @@ import type { NcageRecord } from "@/src/data/fake-db/admin/NcageRecords";
 
 async function getNcageRecords(): Promise<NcageRecord[]> {
   const supabase = createAdminClient();
+  const now = new Date();
 
   const { data, error } = await supabase
     .from("ncage_records")
@@ -13,6 +14,9 @@ async function getNcageRecords(): Promise<NcageRecord[]> {
       entity_name,
       toec,
       ncagesd,
+      issued_at,
+      expires_at,
+      creation_date,
       updated_at,
       domestic_certificate_path,
       ncage_application_id
@@ -30,6 +34,9 @@ async function getNcageRecords(): Promise<NcageRecord[]> {
     entity_name: string | null;
     toec: string | null;
     ncagesd: string | null;
+    issued_at: string | null;
+    expires_at: string | null;
+    creation_date: string | null;
     updated_at: string | null;
     domestic_certificate_path: string | null;
     ncage_application_id: string | null;
@@ -57,6 +64,19 @@ async function getNcageRecords(): Promise<NcageRecord[]> {
   }
 
   return rows.map((row) => {
+    const issuedAtRaw = row.issued_at ?? row.creation_date ?? row.updated_at;
+    const expiresAtRaw =
+      row.expires_at ??
+      (issuedAtRaw
+        ? new Date(
+            new Date(issuedAtRaw).setFullYear(
+              new Date(issuedAtRaw).getFullYear() + 5,
+            ),
+          ).toISOString()
+        : null);
+
+    const isActive = expiresAtRaw ? new Date(expiresAtRaw) > now : false;
+
     let sertifikat_url = null;
     if (row.domestic_certificate_path && signedUrlsMap[row.domestic_certificate_path]) {
       sertifikat_url = signedUrlsMap[row.domestic_certificate_path];
@@ -66,10 +86,13 @@ async function getNcageRecords(): Promise<NcageRecord[]> {
       id: row.id,
       kode_ncage: row.ncage_code ?? "-",
       nama_perusahaan: row.entity_name ?? "-",
-      status_kode: row.ncagesd === "A" ? "Aktif" : "Tidak Aktif",
+      status_kode: isActive ? "Aktif" : "Tidak Aktif",
       tipe_entitas: row.toec ?? "-",
-      tanggal_terbit: row.updated_at
-        ? new Date(row.updated_at).toISOString().split("T")[0]
+      tanggal_terbit: issuedAtRaw
+        ? new Date(issuedAtRaw).toISOString().split("T")[0]
+        : "-",
+      tanggal_kadaluarsa: expiresAtRaw
+        ? new Date(expiresAtRaw).toISOString().split("T")[0]
         : "-",
       permohonan_id: row.ncage_application_id ?? "-",
       sertifikat_url,
@@ -81,13 +104,13 @@ export default async function NcageRecordsPage() {
   const records = await getNcageRecords();
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+    <div className="p-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+      <div>
+        <h1 className="text-[28px] font-semibold text-gray-800 tracking-tight">
           NCAGE Records
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Rekap seluruh kode NCAGE yang telah diterbitkan beserta statusnya.
+        <p className="text-[14px] text-gray-500 mt-2.5 font-normal leading-relaxed">
+          Rekap seluruh kode NCAGE yang telah diterbitkan beserta statusnya secara sistematis.
         </p>
       </div>
 

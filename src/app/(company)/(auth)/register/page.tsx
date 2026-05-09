@@ -28,7 +28,7 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      <div className="bg-white w-full max-w-5xl p-10 sm:p-14 rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-10 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out border border-white/50">
+      <div className="bg-white w-full max-w-5xl p-10 sm:p-14 rounded-[15px] shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-10 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out border border-white/50">
         <div className="relative mb-14 text-center">
           <Link
             href="/login"

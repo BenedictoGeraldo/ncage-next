@@ -11,8 +11,9 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-24 bg-[#F5EEE8] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-32 pb-12 bg-[#F5EEE8] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#B97A57]/20 rounded-full translate-x-1/3 -translate-y-1/3" />
+      <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-[#B97A57]/10 rounded-full -translate-x-1/4 translate-y-1/4" />
 
       <div className="absolute top-6 left-10 flex items-center gap-3">
         <Image
@@ -30,8 +31,8 @@ const LoginPage = () => {
         </div>
       </div>
 
-      <div className={`bg-[#FFFFFF] w-full max-w-[520px] px-8 sm:px-12 py-10 rounded-[15px] shadow-xl z-10 border border-gray-100 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out ${state?.error ? 'animate-shake' : ''}`}>
-        <h2 className="text-center text-[#8B1E1E] font-semibold text-2xl mb-10 tracking-tight">
+      <div className={`bg-[#FFFFFF] w-full max-w-[560px] p-10 sm:p-14 rounded-[15px] shadow-xl shadow-gray-200/40 z-10 border border-gray-100/50 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-700 ease-out ${state?.error ? 'animate-shake' : ''}`}>
+        <h2 className="text-center text-[#8B1E1E] font-semibold text-2xl mb-8 tracking-tight">
           Selamat Datang di Layanan NCAGE
         </h2>
 
@@ -49,10 +50,10 @@ const LoginPage = () => {
                 name="email"
                 placeholder="Masukkan alamat email"
                 required
-                className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl text-[#374151] font-medium placeholder:font-normal placeholder:text-gray-400/50 focus:outline-none focus:ring-4 transition-all ${
+                className={`w-full pl-12 pr-4 py-3.5 bg-white border rounded-xl text-[#374151] font-medium placeholder:font-normal placeholder:text-gray-400/50 focus:outline-none focus:ring-4 transition-all ${
                   state?.error 
                     ? 'border-red-400 focus:ring-red-400/10 focus:border-red-400 bg-red-50/10' 
-                    : 'border-[#E5E7EB] focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]'
+                    : 'border-[#E5E7EB]/70 focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]'
                 }`}
               />
             </div>
@@ -79,10 +80,10 @@ const LoginPage = () => {
                 }}
                 placeholder="Masukkan Kata Sandi"
                 required
-                className={`w-full pl-12 pr-12 py-3 bg-white border rounded-xl text-[#374151] font-medium placeholder:font-normal placeholder:text-gray-400/50 focus:outline-none focus:ring-4 transition-all ${
+                className={`w-full pl-12 pr-12 py-3.5 bg-white border rounded-xl text-[#374151] font-medium placeholder:font-normal placeholder:text-gray-400/50 focus:outline-none focus:ring-4 transition-all ${
                   state?.error 
                     ? 'border-red-400 focus:ring-red-400/10 focus:border-red-400 bg-red-50/10' 
-                    : 'border-[#E5E7EB] focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]'
+                    : 'border-[#E5E7EB]/70 focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]'
                 }`}
               />
               <button
@@ -100,7 +101,7 @@ const LoginPage = () => {
             )}
           </div>
 
-          <div className="text-right mb-8">
+          <div className="text-right mb-6">
             <Link
               href="/forgot-password"
               className="text-sm text-[#8B1E1E] font-medium hover:opacity-80 transition-opacity"
@@ -111,7 +112,7 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#5D3A3A] text-white py-4 rounded-xl font-bold text-base hover:bg-[#4a2e2e] transition-all active:scale-[0.98] shadow-lg shadow-[#5D3A3A]/10"
+            className="w-full bg-[#5D3A3A] text-white py-3.5 rounded-xl font-bold text-base hover:bg-[#4a2e2e] transition-all active:scale-[0.98] shadow-lg shadow-[#5D3A3A]/10"
           >
             Masuk
           </button>

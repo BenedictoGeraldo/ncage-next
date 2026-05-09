@@ -46,8 +46,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/60">
+    <div className="bg-white rounded-[15px] border border-gray-100/40 shadow-sm shadow-gray-100/40 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-100/40 bg-gray-50/30">
         <h2 className="text-[13px] font-bold text-gray-700 uppercase tracking-widest">
           {title}
         </h2>
@@ -121,7 +121,7 @@ function ConfirmModal({
       title: "Minta Revisi",
       desc: "Tuliskan catatan revisi yang perlu diperbaiki oleh pemohon.",
       confirmLabel: "Kirim Revisi",
-      confirmClass: "bg-orange-500 hover:bg-orange-600",
+      confirmClass: "bg-orange-600 hover:bg-orange-500 shadow-sm shadow-orange-600/10",
     },
   }[type];
 
@@ -131,19 +131,19 @@ function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/70 transition-opacity animate-in fade-in duration-300"
         onClick={onCancel}
       />
-      <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white border border-gray-100/40 rounded-[15px] shadow-xl p-8 max-w-md w-full animate-in zoom-in-95 duration-300 z-20">
         <div
           className={`w-14 h-14 ${config.iconBg} rounded-full flex items-center justify-center mx-auto mb-4`}
         >
           <i className={`${config.icon} text-3xl`} />
         </div>
-        <h3 className="text-lg font-bold text-gray-900 text-center mb-2">
+        <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
           {config.title}
         </h3>
-        <p className="text-sm text-gray-500 text-center leading-relaxed mb-4">
+        <p className="text-[13px] text-gray-500 text-center leading-relaxed mb-4">
           {config.desc}
         </p>
 
@@ -151,23 +151,23 @@ function ConfirmModal({
           <textarea
             value={catatanRevisi}
             onChange={(e) => onCatatanChange(e.target.value)}
-            placeholder="Contoh: Dokumen NPWP tidak terbaca, harap upload ulang dengan resolusi lebih tinggi..."
+            placeholder="Contoh: Dokumen NPWP tidak terbaca, harap upload ulang dengan resolusi lebih tinggi"
             rows={4}
-            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all resize-none mb-4"
+            className="w-full px-4 py-2.5 text-[13px] font-medium border border-gray-300 rounded-[15px] bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/60 transition-all resize-none mb-4"
           />
         )}
 
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-colors"
+            className="flex-1 py-3 px-4 rounded-[15px] border border-gray-300 text-gray-700 text-[13px] font-semibold hover:bg-gray-50 transition-all duration-200"
           >
             Batal
           </button>
           <button
             onClick={() => onConfirm(isRevisi ? catatanRevisi : undefined)}
             disabled={disableConfirm}
-            className={`flex-1 py-2.5 rounded-xl text-white text-sm font-semibold transition-colors disabled:opacity-50 ${config.confirmClass}`}
+            className={`flex-1 py-3 px-4 rounded-[15px] text-white text-[13px] font-semibold transition-all duration-200 disabled:opacity-50 ${config.confirmClass}`}
           >
             {isPending ? "Memproses..." : config.confirmLabel}
           </button>
@@ -212,7 +212,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
+    <div className="p-8 max-w-5xl mx-auto space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
       <ConfirmModal
         type={activeModal}
         isPending={isPending}
@@ -239,7 +239,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
               {data.id}
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-[28px] font-semibold text-gray-800 tracking-tight">
             Detail NCAGE — {data.nama_perusahaan ?? "—"}
           </h1>
         </div>
@@ -250,7 +250,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
               <button
                 onClick={() => setActiveModal("tolak")}
                 disabled={isPending}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-700 text-[13px] font-semibold hover:bg-red-100 active:scale-95 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-[15px] border border-red-100/50 bg-red-50/60 text-red-700 text-[13px] font-semibold hover:bg-red-100/80 active:scale-95 transition-all disabled:opacity-50"
               >
                 <i className="ri-close-circle-line" />
                 Tolak
@@ -258,7 +258,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
               <button
                 onClick={() => setActiveModal("revisi")}
                 disabled={isPending}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-orange-200 bg-orange-50 text-orange-700 text-[13px] font-semibold hover:bg-orange-100 active:scale-95 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-[15px] border border-orange-100/60 bg-orange-50/50 text-orange-700 text-[13px] font-semibold hover:bg-orange-100/80 active:scale-95 transition-all disabled:opacity-50"
               >
                 <i className="ri-edit-2-line" />
                 Minta Revisi
@@ -266,7 +266,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
               <button
                 onClick={() => setActiveModal("acc")}
                 disabled={isPending}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-[13px] font-semibold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm shadow-emerald-600/20 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-[15px] bg-emerald-600 text-white text-[13px] font-semibold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm shadow-emerald-600/20 disabled:opacity-50"
               >
                 <i className="ri-checkbox-circle-line" />
                 Setuju & Terbitkan
@@ -276,7 +276,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
 
           <button
             onClick={() => router.push("/admin/data-permohonan")}
-            className="flex ml-auto items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B1E1E] text-white text-[13px] font-semibold hover:bg-[#6e1818] active:scale-95 transition-all shadow-sm shadow-[#8B1E1E]/20"
+            className="flex ml-auto items-center gap-2 px-4 py-2.5 rounded-[15px] bg-[#8B1E1E] text-white text-[13px] font-semibold hover:bg-[#6e1818] active:scale-95 transition-all shadow-sm shadow-[#8B1E1E]/20"
           >
             <i className="ri-arrow-left-line" />
             Kembali
@@ -311,7 +311,7 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
             }
           />
           {data.revision_notes && (
-            <div className="col-span-2 p-4 bg-orange-50 border border-orange-100 rounded-xl">
+            <div className="col-span-2 p-4 bg-orange-50/40 border border-orange-100/50 rounded-[15px]">
               <p className="text-[11px] font-bold text-orange-600 uppercase tracking-wider mb-1.5">
                 <i className="ri-edit-2-line mr-1" />
                 Catatan Revisi
@@ -330,10 +330,10 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
             {docList.map((doc) => (
               <div
                 key={doc.key}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-[13px] font-medium transition-all ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-[15px] border text-[13px] font-medium transition-all ${
                   doc.url
-                    ? "border-emerald-200 bg-emerald-50/50 text-emerald-700"
-                    : "border-gray-100 bg-gray-50 text-gray-400"
+                    ? "border-emerald-100 bg-emerald-50/30 text-emerald-700"
+                    : "border-gray-100/30 bg-gray-50/30 text-gray-400"
                 }`}
               >
                 <i
@@ -355,14 +355,14 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
             ))}
           </div>
 
-          <div className="pt-3 border-t border-gray-100">
+          <div className="pt-3 border-t border-gray-100/40">
             <p className="text-[12px] font-semibold text-gray-500 mb-2">
               Preview Dokumen
             </p>
             <select
               value={selectedDoc}
               onChange={(e) => setSelectedDoc(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]/10 focus:border-[#8B1E1E] transition-all mb-3"
+              className="w-full px-4 py-2.5 text-[13px] font-medium border border-gray-200/50 rounded-[15px] bg-white text-gray-600 focus:outline-none focus:ring-4 focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]/40 transition-all mb-3"
             >
               <option value="">— Pilih dokumen —</option>
               {availableDocs.map((doc) => (
@@ -374,11 +374,11 @@ export function DetailPermohonanClient({ data }: { data: PermohonanDetail }) {
             {selectedDoc ? (
               <iframe
                 src={selectedDoc}
-                className="w-full h-[480px] rounded-xl border border-gray-200 bg-gray-50"
+                className="w-full h-[480px] rounded-[15px] border border-gray-200/50 bg-gray-50/30"
                 title="Preview Dokumen"
               />
             ) : (
-              <div className="w-full h-28 rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
+              <div className="w-full h-28 rounded-[15px] border border-dashed border-gray-200/50 bg-gray-50/30 flex items-center justify-center">
                 <p className="text-[13px] text-gray-400">
                   Belum ada dokumen yang dipilih.
                 </p>

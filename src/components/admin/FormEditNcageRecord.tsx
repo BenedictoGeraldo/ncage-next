@@ -25,6 +25,8 @@ export function FormEditNcageRecord({
 }: FormEditNcageRecordProps) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     register,
@@ -32,8 +34,8 @@ export function FormEditNcageRecord({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<NcageRecordFormValues>({
-    resolver: zodResolver(ncageRecordSchema),
+  } = useForm<any>({
+    resolver: zodResolver(ncageRecordSchema) as any,
     defaultValues: {
       ncage_code: initialData?.ncage_code || "",
       entity_name: initialData?.entity_name || "",
@@ -70,7 +72,7 @@ export function FormEditNcageRecord({
 
   const isSamRequested = watch("is_sam_requested");
 
-  const onSubmit = async (data: NcageRecordFormValues) => {
+  const onSubmit = async (data: any) => {
     setIsSaving(true);
     const result = await updateNcageRecord(id, data);
     setIsSaving(false);
@@ -93,77 +95,79 @@ export function FormEditNcageRecord({
     }
   };
 
-  const handleDelete = async () => {
-    const result = await Swal.fire({
-      title: "Apakah Anda yakin?",
-      text: "Data ini akan dihapus secara permanen!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#aa0c0c",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, Hapus!",
-      cancelButtonText: "Batal",
-    });
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
 
-    if (result.isConfirmed) {
-      const deleteRes = await deleteNcageRecord(id);
-      if (deleteRes.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Dihapus!",
-          text: "Data berhasil dihapus.",
-          confirmButtonColor: "#8B1E1E",
-        });
-        router.push("/admin/ncage-records");
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal",
-          text: deleteRes.message || "Terjadi kesalahan.",
-          confirmButtonColor: "#8B1E1E",
-        });
-      }
+  const confirmDelete = async () => {
+    setIsDeleting(true);
+    const deleteRes = await deleteNcageRecord(id);
+    setIsDeleting(false);
+    setShowDeleteModal(false);
+
+    if (deleteRes.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Dihapus!",
+        text: "Data berhasil dihapus.",
+        confirmButtonColor: "#8B1E1E",
+      });
+      router.push("/admin/ncage-records");
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: deleteRes.message || "Terjadi kesalahan.",
+        confirmButtonColor: "#8B1E1E",
+      });
     }
   };
 
   const inputClass =
-    "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#8B1E1E]/10 focus:border-[#8B1E1E] transition-all";
-  const labelClass = "block text-[13px] font-semibold text-gray-700 mb-1.5";
+    "w-full px-4 py-2.5 text-[13px] font-medium border border-gray-200/50 rounded-[10px] bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-[#8B1E1E]/5 focus:border-[#8B1E1E]/40 transition-all";
+  const labelClass = "block text-[13px] font-semibold text-gray-700 mb-1";
 
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <div className="text-sm text-gray-500 mb-1">
+          <div className="text-[13px] text-gray-500 mb-1.5 font-medium">
             <span
-              className="cursor-pointer hover:underline"
+              className="cursor-pointer hover:text-[#8B1E1E] transition-colors"
               onClick={() => router.push("/admin/ncage-records")}
             >
-              Ncage Records
+              NCAGE Records
             </span>{" "}
-            &gt; <span className="text-gray-900">Edit</span>
+            &gt; <span className="text-gray-900 font-semibold">Edit</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Edit Ncage Record
+          <h1 className="text-[28px] font-semibold text-gray-800 tracking-tight">
+            Edit NCAGE Record
           </h1>
         </div>
-        <button
-          onClick={handleDelete}
-          type="button"
-          className="bg-red-800 hover:bg-red-900 text-white px-5 py-2 rounded-lg font-semibold text-sm transition-colors shadow-sm shadow-red-500/20 active:scale-95"
-        >
-          Delete
-        </button>
+        <div className="relative group">
+          <button
+            onClick={handleDelete}
+            type="button"
+            className="w-10 h-10 rounded-[15px] border border-red-200 bg-red-50/50 hover:bg-red-500 text-red-600 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 shadow-sm shadow-red-100/10"
+          >
+            <i className="ri-delete-bin-6-line text-lg" />
+          </button>
+          
+          {/* Beautiful Smooth Hover Description Tooltip */}
+          <div className="absolute top-12 right-0 pointer-events-none opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 bg-gray-900 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-[8px] whitespace-nowrap shadow-lg shadow-gray-950/10 border border-gray-800/80 z-10">
+            Hapus NCAGE Record
+          </div>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-            <h2 className="text-[15px] font-bold text-gray-800">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="bg-white rounded-[15px] border border-gray-100/40 shadow-sm shadow-gray-100/40 overflow-hidden">
+          <div className="px-6 pt-6 pb-2">
+            <h2 className="text-[13px] font-bold text-[#8B1E1E] uppercase tracking-wider">
               Informasi Utama & Status
             </h2>
           </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="px-6 pb-6 pt-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div>
               <label className={labelClass}>
                 Ncage code <span className="text-red-500">*</span>
@@ -175,7 +179,7 @@ export function FormEditNcageRecord({
               />
               {errors.ncage_code && (
                 <span className="text-red-500 text-xs mt-1 block">
-                  {errors.ncage_code.message}
+                  {errors.ncage_code.message as string}
                 </span>
               )}
             </div>
@@ -190,7 +194,7 @@ export function FormEditNcageRecord({
               />
               {errors.entity_name && (
                 <span className="text-red-500 text-xs mt-1 block">
-                  {errors.entity_name.message}
+                  {errors.entity_name.message as string}
                 </span>
               )}
             </div>
@@ -231,13 +235,13 @@ export function FormEditNcageRecord({
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-            <h2 className="text-[15px] font-bold text-gray-800">
+        <div className="bg-white rounded-[15px] border border-gray-100/40 shadow-sm shadow-gray-100/40 overflow-hidden">
+          <div className="px-6 pt-6 pb-2">
+            <h2 className="text-[13px] font-bold text-[#8B1E1E] uppercase tracking-wider">
               Alamat Fisik
             </h2>
           </div>
-          <div className="p-6 space-y-6">
+          <div className="px-6 pb-6 pt-2 space-y-4">
             <div>
               <label className={labelClass}>Jalan</label>
               <textarea
@@ -246,7 +250,7 @@ export function FormEditNcageRecord({
                 className={inputClass}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               <div>
                 <label className={labelClass}>Kota</label>
                 <input
@@ -299,13 +303,13 @@ export function FormEditNcageRecord({
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-            <h2 className="text-[15px] font-bold text-gray-800">
+        <div className="bg-white rounded-[15px] border border-gray-100/40 shadow-sm shadow-gray-100/40 overflow-hidden">
+          <div className="px-6 pt-6 pb-2">
+            <h2 className="text-[13px] font-bold text-[#8B1E1E] uppercase tracking-wider">
               Alamat Surat
             </h2>
           </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="px-6 pb-6 pt-2 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
             <div>
               <label className={labelClass}>PO BOX</label>
               <input type="text" {...register("pob")} className={inputClass} />
@@ -321,11 +325,11 @@ export function FormEditNcageRecord({
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-            <h2 className="text-[15px] font-bold text-gray-800">Kontak</h2>
+        <div className="bg-white rounded-[15px] border border-gray-100/40 shadow-sm shadow-gray-100/40 overflow-hidden">
+          <div className="px-6 pt-6 pb-2">
+            <h2 className="text-[13px] font-bold text-[#8B1E1E] uppercase tracking-wider">Kontak</h2>
           </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="px-6 pb-6 pt-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div>
               <label className={labelClass}>Telepon</label>
               <input type="text" {...register("tel")} className={inputClass} />
@@ -345,13 +349,13 @@ export function FormEditNcageRecord({
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-            <h2 className="text-[15px] font-bold text-gray-800">
+        <div className="bg-white rounded-[15px] border border-gray-100/40 shadow-sm shadow-gray-100/40 overflow-hidden">
+          <div className="px-6 pt-6 pb-2">
+            <h2 className="text-[13px] font-bold text-[#8B1E1E] uppercase tracking-wider">
               Klasifikasi & Referensi
             </h2>
           </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="px-6 pb-6 pt-2 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
             <div>
               <label className={labelClass}>National</label>
               <input
@@ -420,20 +424,60 @@ export function FormEditNcageRecord({
           <button
             type="button"
             onClick={() => router.push("/admin/ncage-records")}
-            className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-semibold text-[14px] hover:bg-gray-50 transition-colors"
+            className="px-6 py-2.5 rounded-[15px] border border-gray-300 text-gray-700 font-semibold text-[14px] hover:bg-gray-50 transition-all duration-200"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={isSaving}
-            className="px-6 py-2.5 rounded-xl bg-[#8B1E1E] text-white font-semibold text-[14px] hover:bg-[#6e1010] active:scale-95 transition-all shadow-sm shadow-[#8B1E1E]/20 disabled:opacity-70 flex items-center gap-2"
+            className="px-6 py-2.5 rounded-[15px] bg-[#8B1E1E] text-white font-semibold text-[14px] hover:bg-[#721818] active:scale-95 transition-all shadow-sm shadow-[#8B1E1E]/20 disabled:opacity-70 flex items-center gap-2"
           >
             {isSaving && <i className="ri-loader-4-line animate-spin" />}
             {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
         </div>
       </form>
+
+      {/* Beautiful Custom Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/70 transition-opacity animate-in fade-in duration-300"
+            onClick={() => !isDeleting && setShowDeleteModal(false)}
+          />
+          <div className="relative bg-white border border-gray-100/40 rounded-[15px] shadow-xl p-8 max-w-md w-full animate-in zoom-in-95 duration-300 z-20">
+            <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-delete-bin-6-line text-3xl text-red-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+              Apakah Anda yakin?
+            </h3>
+            <p className="text-[13px] text-gray-500 text-center leading-relaxed mb-6">
+              Data ini akan dihapus secara permanen dari sistem dan tidak dapat dipulihkan.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-4 rounded-[15px] border border-gray-300 text-gray-700 text-[13px] font-semibold hover:bg-gray-50 transition-all duration-200 disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-4 rounded-[15px] bg-red-600 hover:bg-red-500 text-white text-[13px] font-semibold transition-all duration-200 disabled:opacity-50 shadow-sm shadow-red-600/10"
+              >
+                {isDeleting ? "Memproses..." : "Ya, Hapus!"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

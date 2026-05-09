@@ -37,7 +37,7 @@ export default function FAQSection() {
                   onClick={() => setActiveFaq(isFaqActive ? null : index)}
                 >
                   <div className="p-7 md:px-10 flex justify-between items-center relative">
-                    <h4 className={`text-[17px] font-bold transition-colors duration-500 ${isFaqActive ? "text-[#86000D]" : "text-gray-800"}`}>
+                    <h4 className={`text-[17px] font-semibold transition-colors duration-500 ${isFaqActive ? "text-[#86000D]/90" : "text-gray-600"}`}>
                       {faq.question}
                     </h4>
                     

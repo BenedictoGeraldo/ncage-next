@@ -166,6 +166,7 @@ export async function updateStatusPermohonan(
           domestic_certificate_path:
             updatePayload.domestic_certificate_path || null,
           ncagesd: "A",
+          issued_at: new Date().toISOString(),
         });
 
       if (insertError) {

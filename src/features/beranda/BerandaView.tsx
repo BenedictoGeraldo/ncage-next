@@ -34,7 +34,7 @@ export default function BerandaView() {
             </p>
 
             <div>
-              <Link href="/register" className="inline-block mt-10 bg-[#5D3A3A] text-white px-12 py-3.5 rounded-xl shadow hover:bg-[#4A2D2D] transition text-lg font-semibold">
+              <Link href="/register" className="inline-block mt-10 bg-[#5D3A3A] text-white px-12 py-3.5 rounded-xl shadow hover:bg-[#4A2D2D] transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] hover:shadow-lg hover:shadow-[#5D3A3A]/20 text-lg font-semibold">
                 Mulai Pendaftaran
               </Link>
             </div>
