@@ -1,6 +1,8 @@
 import { createClient } from "@/src/utils/supabase/server";
+import { createAdminClient } from "@/src/utils/supabase/admin";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { DownloadCertificateButton } from "@/src/components/company/DownloadCertificateButton";
 
 const statusConfig: Record<
   number,
@@ -107,12 +109,48 @@ export default async function PantauStatusPage() {
   }
 
   let domesticCertificateUrl: string | null = null;
-  if (data.domestic_certificate_path) {
-    const { data: signedData } = await supabase.storage
+
+  // Cari certificate path: utamanya dari ncage_applications,
+  // fallback ke ncage_records (karena generate sertifikat menyimpannya di sana)
+  let certificatePath: string | null = data.domestic_certificate_path ?? null;
+
+  if (!certificatePath && Number(data.status_id) === 4) {
+    // Gunakan adminClient karena ncage_records tidak punya RLS policy untuk user biasa
+    const adminSupabase = createAdminClient();
+    const { data: ncageRecord } = await adminSupabase
+      .from("ncage_records")
+      .select("domestic_certificate_path")
+      .eq("ncage_application_id", data.id)
+      .maybeSingle();
+
+    certificatePath = ncageRecord?.domestic_certificate_path ?? null;
+  }
+
+  if (certificatePath) {
+    const { data: signedData, error: signedError } = await supabase.storage
       .from("ncage_documents")
-      .createSignedUrl(data.domestic_certificate_path, 3600);
-    if (signedData) {
+      .createSignedUrl(certificatePath, 3600);
+
+    if (signedData?.signedUrl) {
       domesticCertificateUrl = signedData.signedUrl;
+    } else if (signedError) {
+      // Fallback: path di DB tidak cocok dengan file aktual di storage.
+      // Cari file .docx di folder certificates/ milik user ini.
+      const folderPrefix = certificatePath.split("/").slice(0, -1).join("/");
+      const { data: fileList } = await supabase.storage
+        .from("ncage_documents")
+        .list(folderPrefix, { limit: 20, sortBy: { column: "created_at", order: "desc" } });
+
+      const certFile = fileList?.find((f) => f.name.endsWith(".docx"));
+      if (certFile) {
+        const actualPath = `${folderPrefix}/${certFile.name}`;
+        const { data: fallbackSigned } = await supabase.storage
+          .from("ncage_documents")
+          .createSignedUrl(actualPath, 3600);
+        if (fallbackSigned?.signedUrl) {
+          domesticCertificateUrl = fallbackSigned.signedUrl;
+        }
+      }
     }
   }
 
@@ -236,25 +274,20 @@ export default async function PantauStatusPage() {
             </div>
           )}
 
-          {statusId === 4 && data.domestic_certificate_path && (
-            <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start pt-5 pb-2 last:pb-0">
-              <span className="text-gray-500 font-medium text-[15px] pt-1">
-                Dokumen Sertifikat
-              </span>
-              <span className="hidden md:block text-gray-300 pt-1">:</span>
-              <div className="flex flex-col items-start gap-4">
-                <a
-                  href={domesticCertificateUrl || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-100 text-emerald-700 text-[13px] font-bold rounded-xl hover:bg-emerald-200 transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] shadow-sm shadow-emerald-600/20"
-                >
-                  <i className="ri-download-2-line"></i>
-                  Unduh Sertifikat (DOCX)
-                </a>
+          {statusId === 4 && domesticCertificateUrl && (
+              <div className="grid grid-cols-1 md:grid-cols-[200px_auto_1fr] gap-2 md:gap-4 items-start pt-5 pb-2 last:pb-0">
+                <span className="text-gray-500 font-medium text-[15px] pt-1">
+                  Dokumen Sertifikat
+                </span>
+                <span className="hidden md:block text-gray-300 pt-1">:</span>
+                <div className="flex flex-col items-start gap-4">
+                  <DownloadCertificateButton
+                    signedUrl={domesticCertificateUrl}
+                    fileName={`sertifikat-ncage-${data.ncage_code ?? data.id}.docx`}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </div>

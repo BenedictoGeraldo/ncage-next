@@ -190,6 +190,31 @@ export function DataTableNcageRecords({ data }: DataTableNcageRecordsProps) {
         </span>
       ),
     },
+    {
+      accessorKey: "tanggal_kadaluarsa",
+      header: ({ column }) => (
+        <button
+          className="flex items-center gap-1.5 font-semibold hover:text-[#8B1E1E] transition-colors"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Tgl Kadaluarsa
+          <i
+            className={`text-[11px] ${
+              column.getIsSorted() === "asc"
+                ? "ri-arrow-up-s-line text-[#8B1E1E]"
+                : column.getIsSorted() === "desc"
+                  ? "ri-arrow-down-s-line text-[#8B1E1E]"
+                  : "ri-arrow-up-down-line text-gray-400"
+            }`}
+          />
+        </button>
+      ),
+      cell: ({ row }) => (
+        <span className="text-gray-600 text-[13px]">
+          {row.getValue("tanggal_kadaluarsa")}
+        </span>
+      ),
+    },
   ];
 
   const table = useReactTable({

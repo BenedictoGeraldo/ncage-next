@@ -8,6 +8,7 @@ export interface NcageRecord {
   status_kode: StatusKodeNcage;
   tipe_entitas: string;
   tanggal_terbit: string;
+  tanggal_kadaluarsa: string;
   // Referensi ke permohonan asal
   permohonan_id: string;
   sertifikat_url?: string | null;
@@ -22,6 +23,7 @@ export const fakeNcageRecordsData: NcageRecord[] = [
     status_kode: "Aktif",
     tipe_entitas: "A",
     tanggal_terbit: "2026-05-03",
+    tanggal_kadaluarsa: "2031-05-03",
     permohonan_id: "NCG-2026-001",
   },
   {
@@ -31,6 +33,7 @@ export const fakeNcageRecordsData: NcageRecord[] = [
     status_kode: "Aktif",
     tipe_entitas: "B",
     tanggal_terbit: "2026-04-27",
+    tanggal_kadaluarsa: "2031-04-27",
     permohonan_id: "NCG-2026-008",
   },
   {
@@ -40,6 +43,7 @@ export const fakeNcageRecordsData: NcageRecord[] = [
     status_kode: "Aktif",
     tipe_entitas: "B",
     tanggal_terbit: "2026-04-22",
+    tanggal_kadaluarsa: "2031-04-22",
     permohonan_id: "NCG-2026-011",
   },
   {
@@ -49,6 +53,7 @@ export const fakeNcageRecordsData: NcageRecord[] = [
     status_kode: "Tidak Aktif",
     tipe_entitas: "A",
     tanggal_terbit: "2022-03-10",
+    tanggal_kadaluarsa: "2027-03-10",
     permohonan_id: "NCG-2022-004",
   },
 ];

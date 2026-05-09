@@ -35,15 +35,28 @@ async function getDashboardData(viewMode: string, selectedYear: number) {
     .gte("created_at", `${today}T00:00:00`)
     .lte("created_at", `${today}T23:59:59`);
 
-  const { count: activeNcage } = await supabase
+  const { data: ncageStatusRows } = await supabase
     .from("ncage_records")
-    .select("*", { count: "exact", head: true })
-    .eq("ncagesd", "A");
+    .select("ncagesd, expires_at, ncage_application_id");
 
-  const { count: inactiveNcage } = await supabase
-    .from("ncage_records")
-    .select("*", { count: "exact", head: true })
-    .neq("ncagesd", "A");
+  const now = new Date();
+  const activeSet = new Set<string>();
+  let activeNcage = 0;
+  let inactiveNcage = 0;
+
+  (ncageStatusRows || []).forEach((row) => {
+    const isActive = row.expires_at ? new Date(row.expires_at) > now : false;
+
+    if (isActive) {
+      activeNcage += 1;
+      if (row.ncage_application_id) {
+        activeSet.add(row.ncage_application_id);
+      }
+      return;
+    }
+
+    inactiveNcage += 1;
+  });
 
   const { data: allApps } = await supabase
     .from("ncage_applications")
@@ -97,14 +110,6 @@ async function getDashboardData(viewMode: string, selectedYear: number) {
   const { data: provinceData } = await supabase
     .from("company_details")
     .select("province, ncage_application_id");
-
-  const { data: activeAppIds } = await supabase
-    .from("ncage_records")
-    .select("ncage_application_id");
-
-  const activeSet = new Set(
-    (activeAppIds || []).map((r) => r.ncage_application_id),
-  );
 
   const provinceCount: Record<string, number> = {};
   (provinceData || []).forEach((row) => {
