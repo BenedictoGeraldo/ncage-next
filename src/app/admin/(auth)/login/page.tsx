@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useActionState, useEffect } from "react";
-import { adminLogin } from "../action";
+import { adminLogin } from "@/src/services/admin/authService";
 
 const AdminLoginPage = () => {
   const [state, formAction] = useActionState(adminLogin, null);

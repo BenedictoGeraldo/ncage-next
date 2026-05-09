@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useTransition, useEffect, useRef, useActionState } from "react";
-import { sendOtp, verifyOtp } from "./actions";
+import { sendOtp, verifyOtp } from "@/src/services/company/passwordService";
 
 /* ── OTP 6-box input ── */
 function OtpBoxes({

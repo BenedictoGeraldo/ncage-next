@@ -5,7 +5,7 @@ import Stepper, { StepItem } from "@/src/components/ui/Stepper";
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/utils/supabase/client";
-import { checkNcageExpiry, generateApplicationNumber } from "./actions";
+import { checkNcageExpiry, generateApplicationNumber } from "@/src/services/company/pendaftaranService";
 
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

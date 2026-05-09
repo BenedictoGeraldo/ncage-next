@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useActionState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { login } from "../action";
+import { login } from "@/src/services/company/authService";
 
 const LoginPage = () => {
   const [state, formAction] = useActionState(login, null);

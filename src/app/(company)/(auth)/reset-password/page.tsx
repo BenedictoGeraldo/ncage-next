@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useActionState } from "react";
-import { updatePassword } from "./actions";
+import { updatePassword } from "@/src/services/company/passwordService";
 
 export default function ResetPasswordPage() {
   const [showPw, setShowPw] = useState(false);

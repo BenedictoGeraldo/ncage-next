@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { register } from "../action";
+import { register } from "@/src/services/company/authService";
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
