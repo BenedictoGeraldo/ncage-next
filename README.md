@@ -1,6 +1,6 @@
 # NCAGE Indonesia — Platform Pelayanan Kode NCAGE
 
-**Platform digital resmi untuk pendaftaran, verifikasi, dan pemantauan status kode NCAGE (_NATO Codification for Ammunition, General Equipment and Explosives_) Indonesia** yang dikelola oleh Pusat Kodifikasi (_Puskod_) Kementerian Pertahanan RI.
+**Platform digital resmi untuk pendaftaran, verifikasi, dan pemantauan status kode NCAGE (_NATO Commercial and Government Entity_) Indonesia** yang dikelola oleh Pusat Kodifikasi (_Puskod_) Kementerian Pertahanan RI.
 
 Sistem ini menyediakan dua portal utama: **portal perusahaan** untuk pelaku industri pertahanan yang ingin mendaftarkan kode NCAGE dan memantau status pengajuan, serta **portal admin** bagi petugas Puskod Kemhan untuk memverifikasi, menyetujui, merevisi, atau menolak permohonan serta mengelola penerbitan sertifikat NCAGE.
 
