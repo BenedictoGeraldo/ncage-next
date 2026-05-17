@@ -7,7 +7,8 @@ async function getPermohonanList(): Promise<PermohonanRow[]> {
   const { data, error } = await supabase
     .from("ncage_applications")
     .select(`*, statuses ( name ), application_contacts ( name ), company_details ( name )`)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(500);
 
   if (error) { console.error("[data-permohonan] Gagal fetch data:", error.message); return []; }
 

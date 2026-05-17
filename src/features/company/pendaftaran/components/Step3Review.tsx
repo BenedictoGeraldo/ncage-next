@@ -92,6 +92,7 @@ export default function Step3Review() {
                 if (file) {
                   const url = URL.createObjectURL(file);
                   window.open(url, "_blank");
+                  setTimeout(() => URL.revokeObjectURL(url), 30000);
                 }
               };
 

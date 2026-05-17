@@ -33,22 +33,21 @@ async function getDashboardData(viewMode: string, selectedYear: number) {
     inactiveNcage += 1;
   });
 
-  const { data: allApps } = await supabase.from("ncage_applications").select("status_id");
+  const { data: allApps } = await supabase.from("ncage_applications").select("status_id, created_at");
   const statusCount: Record<number, number> = {};
   (allApps || []).forEach((app) => { const sid = app.status_id as number; statusCount[sid] = (statusCount[sid] || 0) + 1; });
   const statusDistribution = Object.entries(STATUS_CONFIG).map(([id, cfg]) => ({ name: cfg.name, value: statusCount[Number(id)] || 0, color: cfg.color })).filter((s) => s.value > 0);
 
-  const { data: allAppsDate } = await supabase.from("ncage_applications").select("created_at");
   let registrationTrend: { label: string; count: number }[] = [];
 
   if (viewMode === "yearly") {
     const currentYear = new Date().getFullYear();
     const yearCount: Record<number, number> = {};
-    (allAppsDate || []).forEach((app) => { const year = new Date(app.created_at).getFullYear(); yearCount[year] = (yearCount[year] || 0) + 1; });
+    (allApps || []).forEach((app) => { const year = new Date(app.created_at).getFullYear(); yearCount[year] = (yearCount[year] || 0) + 1; });
     for (let y = 2023; y <= currentYear; y++) registrationTrend.push({ label: String(y), count: yearCount[y] || 0 });
   } else {
     const monthCount: Record<number, number> = {};
-    (allAppsDate || []).forEach((app) => { const d = new Date(app.created_at); if (d.getFullYear() === selectedYear) { const m = d.getMonth(); monthCount[m] = (monthCount[m] || 0) + 1; } });
+    (allApps || []).forEach((app) => { const d = new Date(app.created_at); if (d.getFullYear() === selectedYear) { const m = d.getMonth(); monthCount[m] = (monthCount[m] || 0) + 1; } });
     registrationTrend = MONTHS.map((label, i) => ({ label, count: monthCount[i] || 0 }));
   }
 

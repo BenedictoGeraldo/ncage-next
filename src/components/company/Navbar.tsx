@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/src/utils/supabase/client";
@@ -23,7 +23,7 @@ const Navbar = () => {
     company: string;
   } | null>(null);
   const pathname = usePathname();
-  const supabase = createClient();
+  const supabase = useRef(createClient()).current;
   const isBeranda = pathname === "/beranda";
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);

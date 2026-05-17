@@ -27,7 +27,8 @@ async function getNcageRecords(): Promise<NcageRecord[]> {
     .from("ncage_records")
     .select(`id, ncage_code, ncagesd, issued_at, expires_at, creation_date, updated_at, domestic_certificate_path, ncage_application_id,
       ncage_applications ( *, company_details ( name ), application_identities ( entity_type ) )`)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(500);
 
   if (error) { console.error("[ncage-records] Gagal fetch data:", error.message); return []; }
 

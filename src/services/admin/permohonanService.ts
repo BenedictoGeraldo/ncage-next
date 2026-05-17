@@ -8,21 +8,19 @@ import { createNotification } from "@/src/lib/notifications";
 async function generateSequentialNCAGE(
   supabase: ReturnType<typeof createAdminClient>,
 ): Promise<string> {
-  // Ambil semua kode NCAGE yang sudah ada dan cocok dengan format XXXXZ
   const { data, error } = await supabase
     .from("ncage_records")
     .select("ncage_code")
-    .like("ncage_code", "____Z");
+    .like("ncage_code", "____Z")
+    .order("ncage_code", { ascending: false })
+    .limit(1);
 
   let maxNumber = 0;
 
   if (!error && data && data.length > 0) {
-    for (const record of data) {
-      const code = record.ncage_code as string | null;
-      if (code && /^\d{4}Z$/.test(code)) {
-        const num = parseInt(code.substring(0, 4), 10);
-        if (num > maxNumber) maxNumber = num;
-      }
+    const code = data[0].ncage_code as string | null;
+    if (code && /^\d{4}Z$/.test(code)) {
+      maxNumber = parseInt(code.substring(0, 4), 10);
     }
   }
 
@@ -47,8 +45,10 @@ export async function updateStatusPermohonan(
     updatePayload.revision_notes = catatanRevisi;
   }
 
+  let appData: Record<string, unknown> | null = null;
+
   if (statusId === 4) {
-    const { data: appData, error: appError } = await supabase
+    const { data, error: appError } = await supabase
       .from("ncage_applications")
       .select(
         `
@@ -65,7 +65,7 @@ export async function updateStatusPermohonan(
       .eq("id", applicationId)
       .single();
 
-    if (appError || !appData) {
+    if (appError || !data) {
       console.error("Gagal mengambil data aplikasi:", appError);
       return {
         success: false,
@@ -73,25 +73,26 @@ export async function updateStatusPermohonan(
       };
     }
 
-    const company = Array.isArray(appData.company_details)
-      ? appData.company_details[0]
-      : appData.company_details;
+    appData = data as unknown as Record<string, unknown>;
 
-    // Gunakan kode yang sudah ada (kasus renewal) atau generate kode baru (pendaftaran pertama)
-    const ncageCode = appData.ncage_code || (await generateSequentialNCAGE(supabase));
+    const company = Array.isArray(appData.company_details)
+      ? (appData.company_details as Record<string, unknown>[])[0]
+      : (appData.company_details as Record<string, unknown> | null);
+
+    const ncageCode = (appData.ncage_code as string | null) || (await generateSequentialNCAGE(supabase));
     updatePayload.ncage_code = ncageCode;
 
     try {
       const certBuffer = await generateCertificate({
         ncage_code: ncageCode,
-        entity_name: company?.name || "-",
-        street: company?.street || "-",
-        city: company?.city || "-",
-        stt: company?.province || "-",
-        psc: company?.postal_code || "-",
-        tel: company?.phone || "-",
-        ema: company?.email || "-",
-        www: company?.website || "-",
+        entity_name: (company?.name as string) || "-",
+        street: (company?.street as string) || "-",
+        city: (company?.city as string) || "-",
+        stt: (company?.province as string) || "-",
+        psc: (company?.postal_code as string) || "-",
+        tel: (company?.phone as string) || "-",
+        ema: (company?.email as string) || "-",
+        www: (company?.website as string) || "-",
       });
 
       const certFilename = `Sertifikat_NCAGE_${ncageCode}_${Date.now()}.docx`;
@@ -129,94 +130,82 @@ export async function updateStatusPermohonan(
     return { success: false, message: error.message };
   }
 
-  const { data: appMeta } = await supabase
-    .from("ncage_applications")
-    .select(
-      `
-      user_id,
-      ncage_code,
-      company_details ( name, street, city, province, postal_code, phone, email, website ),
-      application_identities ( entity_type )
-    `,
-    )
-    .eq("id", applicationId)
-    .single();
+  const userId = appData?.user_id as string | null | undefined;
 
-  const userId = appMeta?.user_id;
+  if (statusId === 3) {
+    const { data: appMeta } = await supabase
+      .from("ncage_applications")
+      .select("user_id")
+      .eq("id", applicationId)
+      .single();
 
-  if (statusId === 3 && userId) {
-    await createNotification({
-      user_id: userId,
-      type: "warning",
-      title: "Permohonan Butuh Perbaikan",
-      description: catatanRevisi
-        ? `Permohonan NCAGE Anda memerlukan perbaikan. Catatan dari admin: ${catatanRevisi}`
-        : "Permohonan NCAGE Anda memerlukan perbaikan. Silakan cek catatan revisi di halaman Pantau Status.",
-      related_application_id: applicationId,
-    });
+    const metaUserId = appMeta?.user_id;
+
+    if (metaUserId) {
+      await createNotification({
+        user_id: metaUserId,
+        type: "warning",
+        title: "Permohonan Butuh Perbaikan",
+        description: catatanRevisi
+          ? `Permohonan NCAGE Anda memerlukan perbaikan. Catatan dari admin: ${catatanRevisi}`
+          : "Permohonan NCAGE Anda memerlukan perbaikan. Silakan cek catatan revisi di halaman Pantau Status.",
+        related_application_id: applicationId,
+      });
+    }
   }
 
   if (statusId === 4 && userId) {
     const ncageCode = updatePayload.ncage_code as string;
 
-    if (appMeta) {
-      const company = Array.isArray(appMeta.company_details)
-        ? appMeta.company_details[0]
-        : appMeta.company_details;
-      const identity = Array.isArray(appMeta.application_identities)
-        ? appMeta.application_identities[0]
-        : appMeta.application_identities;
+    const company = Array.isArray(appData?.company_details)
+      ? (appData!.company_details as Record<string, unknown>[])[0]
+      : (appData?.company_details as Record<string, unknown> | null);
+    const identity = Array.isArray(appData?.application_identities)
+      ? (appData!.application_identities as Record<string, unknown>[])[0]
+      : (appData?.application_identities as Record<string, unknown> | null);
 
-      // Cek apakah record sudah ada (kasus renewal — ncage_code tetap sama)
-      const { data: existingRecord } = await supabase
+    const { data: existingRecord } = await supabase
+      .from("ncage_records")
+      .select("id")
+      .eq("ncage_application_id", applicationId)
+      .maybeSingle();
+
+    if (existingRecord) {
+      const { error: updateError } = await supabase
         .from("ncage_records")
-        .select("id")
-        .eq("ncage_application_id", applicationId)
-        .maybeSingle();
+        .update({
+          domestic_certificate_path:
+            updatePayload.domestic_certificate_path || null,
+          issued_at: new Date().toISOString(),
+        })
+        .eq("ncage_application_id", applicationId);
 
-      if (existingRecord) {
-        // UPDATE — only update certificate path and issued_at
-        const { error: updateError } = await supabase
-          .from("ncage_records")
-          .update({
-            domestic_certificate_path:
-              updatePayload.domestic_certificate_path || null,
-            issued_at: new Date().toISOString(),
-          })
-          .eq("ncage_application_id", applicationId);
-
-        if (updateError) {
-          console.error("Gagal update ncage_records:", updateError.message);
-          return {
-            success: false,
-            message: "Gagal memperbarui ncage_records: " + updateError.message,
-          };
-        }
-      } else {
-        // INSERT — first-time registration
-        const { error: insertError } = await supabase
-          .from("ncage_records")
-          .insert({
-            ncage_application_id: applicationId,
-            ncage_code: ncageCode || appMeta.ncage_code,
-            ncagesd: "A",
-            domestic_certificate_path:
-              updatePayload.domestic_certificate_path || null,
-            issued_at: new Date().toISOString(),
-          });
-
-        if (insertError) {
-          console.error("Gagal insert ke ncage_records:", insertError.message);
-          return {
-            success: false,
-            message: "Gagal menyimpan ke ncage_records: " + insertError.message,
-          };
-        }
+      if (updateError) {
+        console.error("Gagal update ncage_records:", updateError.message);
+        return {
+          success: false,
+          message: "Gagal memperbarui ncage_records: " + updateError.message,
+        };
       }
+    } else {
+      const { error: insertError } = await supabase
+        .from("ncage_records")
+        .insert({
+          ncage_application_id: applicationId,
+          ncage_code: ncageCode || (appData?.ncage_code as string | undefined),
+          ncagesd: "A",
+          domestic_certificate_path:
+            updatePayload.domestic_certificate_path || null,
+          issued_at: new Date().toISOString(),
+        });
 
-      // Suppress unused variable warning
-      void company;
-      void identity;
+      if (insertError) {
+        console.error("Gagal insert ke ncage_records:", insertError.message);
+        return {
+          success: false,
+          message: "Gagal menyimpan ke ncage_records: " + insertError.message,
+        };
+      }
     }
 
     await createNotification({
@@ -228,15 +217,25 @@ export async function updateStatusPermohonan(
     });
   }
 
-  if (statusId === 5 && userId) {
-    await createNotification({
-      user_id: userId,
-      type: "warning",
-      title: "Permohonan NCAGE Ditolak",
-      description:
-        "Permohonan NCAGE Anda telah ditolak. Silakan hubungi tim Puskod Kemhan untuk informasi lebih lanjut.",
-      related_application_id: applicationId,
-    });
+  if (statusId === 5) {
+    const { data: appMeta } = await supabase
+      .from("ncage_applications")
+      .select("user_id")
+      .eq("id", applicationId)
+      .single();
+
+    const metaUserId = appMeta?.user_id;
+
+    if (metaUserId) {
+      await createNotification({
+        user_id: metaUserId,
+        type: "warning",
+        title: "Permohonan NCAGE Ditolak",
+        description:
+          "Permohonan NCAGE Anda telah ditolak. Silakan hubungi tim Puskod Kemhan untuk informasi lebih lanjut.",
+        related_application_id: applicationId,
+      });
+    }
   }
 
   revalidatePath("/admin/data-permohonan");

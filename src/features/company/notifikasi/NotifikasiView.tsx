@@ -34,7 +34,8 @@ export default function NotifikasiView() {
         .from("notifications")
         .select("id, type, title, description, is_read, created_at")
         .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(50);
       if (data && !cancelled) {
         setNotifications(
           data.map((n) => ({

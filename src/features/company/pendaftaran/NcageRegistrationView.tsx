@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Stepper, { StepItem } from "@/src/components/ui/Stepper";
 
 import { useRouter } from "next/navigation";
@@ -48,7 +48,7 @@ const NCAGE_STEPS: StepItem[] = [
 
 export default function NcageRegistrationView() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useRef(createClient()).current;
   const [currentStep, setCurrentStep] = useState(1);
   const [modalState, setModalState] = useState<
     "closed" | "confirm" | "success" | "already_registered"
@@ -58,6 +58,9 @@ export default function NcageRegistrationView() {
   const [existingAppId, setExistingAppId] = useState<string | null>(null);
   const [isNearExpiry, setIsNearExpiry] = useState(false);
   const [expiryInfo, setExpiryInfo] = useState<{ daysLeft: number; date: string } | null>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current); }, []);
 
   const methods = useForm<NcageRegistrationFormValues>({
     resolver: zodResolver(ncageRegistrationSchema),
@@ -71,6 +74,8 @@ export default function NcageRegistrationView() {
   }, [currentStep]);
 
   useEffect(() => {
+    let cancelled = false;
+
     const checkRegistration = async () => {
       try {
         const {
@@ -96,10 +101,13 @@ export default function NcageRegistrationView() {
             .limit(1)
             .maybeSingle();
 
+          if (cancelled) return;
+
           if (data) {
             // Jika status = 4 (Sertifikat Diterbitkan), cek apakah H-30 sebelum kadaluarsa
             if (data.status_id === 4) {
               const result = await checkNcageExpiry(data.id);
+              if (cancelled) return;
 
               if (result.found) {
                 const { daysLeft, expiryDateFormatted } = result;
@@ -191,10 +199,12 @@ export default function NcageRegistrationView() {
       } catch (error) {
         console.error("Gagal memeriksa status registrasi:", error);
       } finally {
-        setIsCheckingAuth(false);
+        if (!cancelled) setIsCheckingAuth(false);
       }
     };
     checkRegistration();
+
+    return () => { cancelled = true; };
   }, [supabase, reset]);
 
   const getVisualStep = (step: number) => {
@@ -275,7 +285,7 @@ export default function NcageRegistrationView() {
     }
 
     if (!isStepValid) {
-      setTimeout(() => {
+      scrollTimerRef.current = setTimeout(() => {
         const firstErrorElement = document.querySelector(".text-red-500");
         if (firstErrorElement) {
           firstErrorElement.scrollIntoView({

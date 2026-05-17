@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface DownloadCertificateButtonProps {
   signedUrl: string;
@@ -12,6 +12,9 @@ export function DownloadCertificateButton({
   fileName = "sertifikat-ncage.docx",
 }: DownloadCertificateButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (cleanupTimerRef.current) clearTimeout(cleanupTimerRef.current); }, []);
 
   async function handleDownload() {
     if (!signedUrl) return;
@@ -33,8 +36,7 @@ export function DownloadCertificateButton({
       anchor.click();
       document.body.removeChild(anchor);
 
-      // Bebaskan memori setelah download selesai
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 5000);
+      cleanupTimerRef.current = setTimeout(() => URL.revokeObjectURL(objectUrl), 5000);
     } catch (err) {
       console.error("[DownloadCertificate] Error:", err);
       alert("Gagal mengunduh sertifikat. Silakan coba lagi.");

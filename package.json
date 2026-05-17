@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "node -e \"const fs=require('fs');const p='.next';if(fs.existsSync(p)){fs.rmSync(p,{recursive:true,force:true});console.log('.next deleted')}else{console.log('.next not found')}\""
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
