@@ -8,7 +8,7 @@ import { createClient } from "@/src/utils/supabase/client";
 type ToastState = { visible: boolean; type: "success" | "error"; title: string; message: string };
 
 export default function ProfileView() {
-  const supabase = createClient();
+  const supabase = useRef(createClient()).current;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -103,7 +103,7 @@ export default function ProfileView() {
                   ? <Image src={profileImage} alt="Profile Avatar" width={96} height={96} className="object-cover w-full h-full" />
                   : <div className="w-full h-full text-white flex items-center justify-center text-3xl font-semibold tracking-wider" style={{ backgroundColor: getAvatarColor(fullName) }}>{getInitials(fullName)}</div>}
               </div>
-              <input type="file" accept="image/*" hidden ref={fileInputRef} onChange={(e) => { const file = e.target.files?.[0]; if (file) setProfileImage(URL.createObjectURL(file)); }} />
+              <input type="file" accept="image/*" hidden ref={fileInputRef} onChange={(e) => { const file = e.target.files?.[0]; if (file) { if (profileImage) URL.revokeObjectURL(profileImage); setProfileImage(URL.createObjectURL(file)); } }} />
               <button onClick={() => fileInputRef.current?.click()} className="absolute bottom-0 right-0 bg-[#86000D] text-white rounded-full w-7 h-7 flex items-center justify-center border-2 border-white shadow-sm hover:bg-[#5D3A3A] transition">
                 <i className="ri-add-line text-sm font-bold"></i>
               </button>

@@ -84,13 +84,15 @@ function AnimatedCounter({
       setCount(0);
       return;
     }
+    let rafId: number;
     const start = performance.now();
     const raf = (time: number) => {
       const progress = Math.min((time - start) / duration, 1);
       setCount(Math.floor((1 - Math.pow(1 - progress, 4)) * target));
-      if (progress < 1) requestAnimationFrame(raf);
+      if (progress < 1) rafId = requestAnimationFrame(raf);
     };
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
+    return () => cancelAnimationFrame(rafId);
   }, [target, duration]);
   return <span>{count.toLocaleString("id-ID")}</span>;
 }
@@ -160,10 +162,12 @@ function IndonesiaMap({
   const [geoData, setGeoData] = useState<any | null>(null);
 
   useEffect(() => {
-    fetch(GEO_URL)
+    const controller = new AbortController();
+    fetch(GEO_URL, { signal: controller.signal })
       .then((r) => r.json())
       .then(setGeoData)
-      .catch(console.error);
+      .catch((err) => { if (err.name !== "AbortError") console.error(err); });
+    return () => controller.abort();
   }, []);
 
   const getFill = (count: number) => {
